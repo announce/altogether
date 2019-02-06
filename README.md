@@ -14,12 +14,12 @@ Altogether is a CLI tool to sync configuration files between 2 major keyboard la
 #### Usage
 
 0. Prepare required parameters
-    * `AL2_ALFRED_PATH`: 
+    * `AL2_ALFRED_PATH`: Specify a path to Alfred's config directory (default path is `${HOME}/.config/Alfred.alfredpreferences`)
     * `AL2_ALBERT_PATH`: Specify a path to Albert's config directory (default path is `${HOME}/.config/albert`)
 0. Execute commands like as following:
 
 ```bash
-export AL2_ALFRED_PATH="__PATH_TO_DIR__" AL2_ALBERT_PATH="__PATH_TO_DIR__"
+export AL2_ALFRED_PATH="__ALFRED_CONFIG_DIR__" AL2_ALBERT_PATH="__ALBERT_CONFIG_DIR__"
 ./altogether help
 ```
 
