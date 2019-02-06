@@ -6,41 +6,33 @@ import (
 
 var Commands = []cli.Command{
 	{
-		Name:  "jira-attachment-stats",
-		Usage: "Shows Jira's attachment statistics",
-		Description: `
-    Shows statistics of attachments uploaded to Jira.
-    Note that the command only can retrieve information accessible to the specified user.
-`,
+		Name:        "sync",
+		Usage:       "Sync configuration files",
+		Description: ``,
 		//Action: jira.PrintAttachmentStats,
-		Flags: adminFlags,
-	},
-	{
-		Name:  "confluence-attachment-stats",
-		Usage: "Shows Confluence's attachment statistics",
-		Description: `
-    Shows statistics of attachments uploaded to Confluence.
-    Note that the command only can retrieve information accessible to the specified user.
-`,
-		//Action: confluence.PrintAttachmentStats,
 		Flags: adminFlags,
 	},
 }
 
 var adminFlags = []cli.Flag{
 	cli.StringFlag{
+		Name:   "alfred-path",
+		Usage:  "Specify path to Alfred configuration root directory",
+		EnvVar: "AL2_ALFRED_PATH",
+	},
+	cli.StringFlag{
+		Name:   "albert-path",
+		Usage:  "Specify path to Albert configuration root directory",
+		EnvVar: "AL2_ALBERT_PATH",
+	},
+	cli.BoolFlag{
 		Name:   "dry-run",
-		Usage:  "Specify your cloud site's URL such as 'https://example.atlassian.net'",
-		EnvVar: "DRY_RUN",
+		Usage:  "Print configuration diff without actual file change",
+		EnvVar: "AL2_PATH_TO_ALBERT",
 	},
-	cli.StringFlag{
-		Name:   "admin-email",
-		Usage:  "Specify an email address of site administrator which you can check at https://id.atlassian.com/manage-profile/email",
-		EnvVar: "AM_ADMIN_EMAIL",
-	},
-	cli.StringFlag{
-		Name:   "api-token",
-		Usage:  "Specify an API token issued at https://id.atlassian.com/manage/api-tokens",
-		EnvVar: "AM_API_TOKEN",
+	cli.BoolFlag{
+		Name:   "daemon",
+		Usage:  "Sync configurations based on file change detection",
+		EnvVar: "AL2_DAEMON",
 	},
 }

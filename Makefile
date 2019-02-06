@@ -1,6 +1,5 @@
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
 
-CLONE_DIR ?= $$(pwd)
 VERSION ?= $$(git describe --tags --always --dirty) ($$(git name-rev --name-only HEAD))
 BUILD_FLAGS := -ldflags "\
 	      -X \"main.Version=$(VERSION)\" \
@@ -32,7 +31,7 @@ release:
 	touch pkg/.gitkeep
 
 $(GO_TESTED): $(GO_FILES)
-	CLONE_DIR="$(CLONE_DIR)" go test -v ./...
+	go test -v ./...
 	touch $(GO_TESTED)
 
 include script/*.mk
