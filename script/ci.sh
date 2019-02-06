@@ -14,9 +14,9 @@ _ci () {
     docker build -t "${TAG_NAME}:${TAG_VERSION}" .
   }
 
-  t () {
+  ci () {
     lint-shell
-    _ make lint build test
+    _ make init lint build test
   }
 
   lint-shell () {

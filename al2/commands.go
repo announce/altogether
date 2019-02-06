@@ -9,12 +9,12 @@ var Commands = []cli.Command{
 		Name:        "sync",
 		Usage:       "Sync configuration files",
 		Description: ``,
-		//Action: jira.PrintAttachmentStats,
-		Flags: adminFlags,
+		Action:      ExecSync,
+		Flags:       optionFlags,
 	},
 }
 
-var adminFlags = []cli.Flag{
+var optionFlags = []cli.Flag{
 	cli.StringFlag{
 		Name:   "alfred-path",
 		Usage:  "Specify path to Alfred configuration root directory",
@@ -35,4 +35,16 @@ var adminFlags = []cli.Flag{
 		Usage:  "Sync configurations based on file change detection",
 		EnvVar: "AL2_DAEMON",
 	},
+}
+
+func ExecSync(c *cli.Context) error {
+	h := &Handler{
+		AlfredPath: c.String("alfred-path"),
+		AlbertPath: c.String("albert-path"),
+		Mode: &Mode{
+			Daemon: c.Bool("daemon"),
+			DryRun: c.Bool("dry-run"),
+		},
+	}
+	return h.Perform()
 }
