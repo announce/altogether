@@ -16,7 +16,7 @@ _ci () {
 
   ci () {
     lint-shell
-    _ make lint build test
+    _ make init lint build test
   }
 
   lint-shell () {

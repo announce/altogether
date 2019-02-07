@@ -24,17 +24,16 @@ func (h *Handler) Perform() error {
 	if err := h.validate(); err != nil {
 		return err
 	}
-	web := al2.Web{&al2.Pair{
-		al2.Launcher{
-			Type:     al2.Alfred,
-			BasePath: h.AlfredPath,
-		},
-		al2.Launcher{
+	pair := &al2.Pair{&al2.Launcher{
+		Type:     al2.Alfred,
+		BasePath: h.AlfredPath,
+	},
+		&al2.Launcher{
 			Type:     al2.Albert,
 			BasePath: h.AlbertPath,
-		},
-	}}
-	return web.Sync()
+		}}
+	web := &al2.Web{Launchers: pair}
+	return web.Sync(al2.Option{DtyRun: h.Mode.DryRun})
 }
 
 func (h *Handler) init() {
