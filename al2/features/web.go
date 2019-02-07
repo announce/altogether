@@ -31,7 +31,24 @@ type Launcher struct {
 	FileInfo   os.FileInfo
 }
 
+func (l Launcher) Mtime() int64 {
+	return l.FileInfo.ModTime().Unix()
+}
+
 type Pair [2]*Launcher
+
+func (p Pair) Len() int {
+	return len(p)
+}
+
+func (p Pair) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+func (p Pair) Less(i, j int) bool {
+	return p[i].Mtime() < p[j].Mtime()
+}
+
 type Web struct {
 	log       *log.Logger
 	Launchers *Pair
@@ -55,13 +72,14 @@ func (w *Web) Sync(option Option) error {
 		return nil
 	}
 	if err := w.parse(direction[0]); err != nil {
-		w.log.Println("[Error] Failed to parse 0-config:", direction[0])
+		w.log.Println("[Error] Failed to parse 0-config:", direction[0], err)
 		return err
 	}
 	if err := w.parse(direction[1]); err != nil {
-		w.log.Println("[Error] Failed to parse 1-config:", direction[1])
+		w.log.Println("[Error] Failed to parse 1-config:", direction[1], err)
 		return err
 	}
+	w.log.Printf("w.AlfredPrefs: %+v,\nw.AlbertEngines: %+v", w.AlfredPrefs, w.AlbertEngines)
 
 	// @TODO os.Chtimes to avoid loop
 	return nil
@@ -84,26 +102,22 @@ func (w *Web) compare() (*Pair, error) {
 		}
 		launcher.FileInfo = info
 	}
-	if w.Launchers[0].FileInfo.ModTime().Unix() == w.Launchers[1].FileInfo.ModTime().Unix() {
+	if w.Launchers[0].Mtime() == w.Launchers[1].Mtime() {
 		return nil, nil
 	}
-
-	sort.Slice(w.Launchers, func(i, j int) bool {
-		return w.Launchers[i].FileInfo.ModTime().Unix() < w.Launchers[j].FileInfo.ModTime().Unix()
-	})
+	sort.Sort(w.Launchers)
 	return w.Launchers, nil
 }
 
 type AlfredSite struct {
-	Enabled bool
-	Keyword string
-	Text    string
-	Url     string
-	Utf8    bool
+	Enabled bool   `plist:"enabled"`
+	Keyword string `plist:"keyword"`
+	Text    string `plist:"text"`
+	Url     string `plist:"url"`
+	Utf8    bool   `plist:"utf8"`
 }
 type AlfredPrefs struct {
-	Key   string
-	Value map[string]AlfredSite
+	CustomSites map[string]AlfredSite `plist:"customSites"`
 }
 
 type AlbertEngines []AlbertEngine
@@ -116,6 +130,9 @@ type AlbertEngine struct {
 
 func (w *Web) parse(launcher *Launcher) error {
 	file, err := os.Open(launcher.ConfigPath)
+	if err != nil {
+		return err
+	}
 	defer func() {
 		c := file.Close()
 		if c == nil {
@@ -123,9 +140,6 @@ func (w *Web) parse(launcher *Launcher) error {
 		}
 		err = fmt.Errorf("failed to close: %v, the original error: %v", c, err)
 	}()
-	if err != nil {
-		return err
-	}
 	switch launcher.Type {
 	case Alfred:
 		{
