@@ -3,15 +3,15 @@ Altogether
 
 [![master]()](https://github.com/announce/altogether)
 
-#### Altogether in a nutshell
+## Altogether in a nutshell
 
 Altogether is a CLI tool to sync configuration files between 2 major keyboard launchers -- Alfred and Albert.
 
-#### Installation
+## Installation
 
 * Download package
 
-#### Usage
+## Usage
 
 0. Prepare required parameters
     * `AL2_ALFRED_PATH`: Specify a path to Alfred's config directory (default path is `${HOME}/.config/Alfred.alfredpreferences`)
@@ -26,7 +26,7 @@ export AL2_ALFRED_PATH="__ALFRED_CONFIG_DIR__" AL2_ALBERT_PATH="__ALBERT_CONFIG_
 ```text
 ```
 
-#### Supported Versions
+## Supported Versions
 
 [Alfred](https://www.alfredapp.com/changelog/):
 
@@ -37,13 +37,12 @@ export AL2_ALFRED_PATH="__ALFRED_CONFIG_DIR__" AL2_ALBERT_PATH="__ALBERT_CONFIG_
 * 0.16.x
 
 
-#### Contribution
+## Contribution
 
 Here's how to get started!
 
-1. Install [Docker](https://docs.docker.com/install/)
-** Verified version: `18.09.1-ce`
-1. Then, start developing as below:
+1. Install [Docker](https://docs.docker.com/install/) (verified version: `18.09.1-ce`)
+1. Build container:
  
  ```bash
  ./script/ci.sh init

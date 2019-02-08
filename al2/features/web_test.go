@@ -28,7 +28,7 @@ func TestWeb_Sync(t *testing.T) {
 		}}
 	web := Web{Launchers: pair}
 	t.Run("it works with dry-run option", func(t *testing.T) {
-		err := web.Sync(Option{DtyRun: true})
+		err := web.Sync(Option{DtyRun: true, Verbose: true})
 		assert.OK(t, err == nil)
 	})
 }
