@@ -31,6 +31,10 @@ func TestWeb_Sync(t *testing.T) {
 		err := web.Sync(Option{DtyRun: true, Verbose: true})
 		assert.OK(t, err == nil)
 	})
+	t.Run("it works", func(t *testing.T) {
+		err := web.Sync(Option{DtyRun: false, Verbose: true})
+		assert.OK(t, err == nil)
+	})
 }
 
 func fetchProjectRootPath() string {
