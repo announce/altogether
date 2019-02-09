@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 type Type int
@@ -56,8 +57,9 @@ func (p Pair) Less(i, j int) bool {
 type Web struct {
 	log       *log.Logger
 	Launchers *Pair
-	*AlfredPrefs
-	*AlbertEngines
+	AlfredSites
+	AlbertSites
+	ConfigDict map[string]NormalizableConfig
 }
 
 type Option struct {
@@ -70,32 +72,25 @@ func (w *Web) Sync(option Option) error {
 	if err := w.load(); err != nil {
 		return err
 	}
-	direction, err := w.compare()
-	if err != nil {
-		w.log.Println("[Error] Failed to compare mtime", err)
-		return err
-	} else if direction == nil {
-		w.log.Println("Aborting... Both target has the same mtime.")
-		return nil
+	for _, launcher := range w.Launchers {
+		if err := w.parse(launcher); err != nil {
+			w.log.Printf("[Error] Failed to parse %s-config: %v", launcher.Type, err)
+			return err
+		}
 	}
+	sort.Sort(w.Launchers)
 	if option.Verbose {
-		w.log.Printf("Direction: (0,1)=(%v, %v)",
-			direction[0].Type, direction[1].Type)
+		w.log.Printf("Launchers: (0,1)=(%v,%v)", w.Launchers[0].Type, w.Launchers[1].Type)
 	}
-	if err := w.parse(direction[0]); err != nil {
-		w.log.Println("[Error] Failed to parse 0-config:", direction[0], err)
-		return err
-	}
-	if err := w.parse(direction[1]); err != nil {
-		w.log.Println("[Error] Failed to parse 1-config:", direction[1], err)
-		return err
-	}
+	w.merge()
 	if option.Verbose {
-		w.log.Printf("AlfredPrefs: %+v\nAlbertEngines: %+v",
-			w.AlfredPrefs, w.AlbertEngines)
+		w.log.Printf("ConfigDict: %+v", w.ConfigDict)
 	}
+	if option.DtyRun {
 
-	// @TODO os.Chtimes to avoid loop
+	} else {
+
+	}
 	return nil
 }
 
@@ -104,8 +99,7 @@ func (w *Web) init() {
 	for _, launcher := range w.Launchers {
 		launcher.ConfigPath = filepath.Join(launcher.BasePath, ConfigPath[launcher.Type])
 	}
-	w.AlfredPrefs = &AlfredPrefs{}
-	w.AlbertEngines = &AlbertEngines{}
+	w.ConfigDict = make(map[string]NormalizableConfig)
 }
 
 func (w *Web) load() error {
@@ -119,31 +113,41 @@ func (w *Web) load() error {
 	return nil
 }
 
-func (w *Web) compare() (*Pair, error) {
-	if w.Launchers[0].Mtime() == w.Launchers[1].Mtime() {
-		return nil, nil
-	}
-	sort.Sort(w.Launchers)
-	return w.Launchers, nil
+type NormalizableConfig interface {
+	Normalize() NormalizableConfig
+	//Name()
+	//Url()
+	//Trigger()
+}
+type AlfredSites struct {
+	CustomSites map[string]AlfredSite `plist:"customSites"`
 }
 
 type AlfredSite struct {
 	Enabled bool   `plist:"enabled"`
-	Keyword string `plist:"keyword"`
-	Text    string `plist:"text"`
+	Trigger string `plist:"keyword"`
+	Name    string `plist:"text"`
 	Url     string `plist:"url"`
 	Utf8    bool   `plist:"utf8"`
 }
-type AlfredPrefs struct {
-	CustomSites map[string]AlfredSite `plist:"customSites"`
+
+func (a AlfredSite) Normalize() NormalizableConfig {
+	a.Url = strings.Replace(a.Url, "{query}", "%s", -1)
+	a.Name = strings.Replace(a.Name, "{query}", "%s", -1)
+	return a
 }
 
-type AlbertEngines []AlbertEngine
-type AlbertEngine struct {
+type AlbertSites []AlbertSite
+
+type AlbertSite struct {
 	IconPath string
 	Name     string
 	Trigger  string
 	Url      string
+}
+
+func (a AlbertSite) Normalize() NormalizableConfig {
+	return a
 }
 
 func (w *Web) parse(launcher *Launcher) error {
@@ -162,7 +166,7 @@ func (w *Web) parse(launcher *Launcher) error {
 	case Alfred:
 		{
 			decoder := plist.NewDecoder(file)
-			return decoder.Decode(w.AlfredPrefs)
+			return decoder.Decode(&w.AlfredSites)
 		}
 	case Albert:
 		{
@@ -170,10 +174,31 @@ func (w *Web) parse(launcher *Launcher) error {
 			if err != nil {
 				return err
 			}
-			return json.Unmarshal(b, w.AlbertEngines)
+			return json.Unmarshal(b, &w.AlbertSites)
 		}
 	default:
 		w.log.Fatalln("Unexpected type.")
 	}
 	return nil
+}
+
+func (w *Web) merge() {
+	for _, launcher := range w.Launchers {
+		switch launcher.Type {
+		case Alfred:
+			{
+				for _, v := range w.AlfredSites.CustomSites {
+					w.ConfigDict[v.Trigger] = v.Normalize()
+				}
+			}
+		case Albert:
+			{
+				for _, v := range w.AlbertSites {
+					w.ConfigDict[v.Trigger] = v.Normalize()
+				}
+			}
+		default:
+			w.log.Fatalln("Unexpected type.")
+		}
+	}
 }
