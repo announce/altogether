@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/DHowett/go-plist"
 	"github.com/announce/altogether/al2/util"
+	"github.com/google/uuid"
 
 	"io/ioutil"
 	"log"
@@ -124,65 +125,65 @@ func (w *Web) load() error {
 	return nil
 }
 
-type NormalizableConfig interface {
-	Normalize() NormalizableConfig
-	Id() Id
-}
-type AlfredSites struct {
-	CustomSites map[string]AlfredSite `plist:"customSites"`
-}
-
-type AlfredSite struct {
+type NormalizableConfig struct {
 	Enabled  bool   `plist:"enabled" json:"-"`
+	Utf8     bool   `plist:"utf8" json:"-"`
 	Trigger  string `plist:"keyword" json:"trigger"`
 	Name     string `plist:"text" json:"name"`
 	Url      string `plist:"url" json:"url"`
-	Utf8     bool   `plist:"utf8" json:"-"`
 	IconPath string `plist:"-" json:"iconPath"`
 }
 
-func (a AlfredSite) Normalize() NormalizableConfig {
+func (a NormalizableConfig) Normalize() NormalizableConfig {
+	return a.Albert()
+}
+
+const Spacer = " "
+
+func (a NormalizableConfig) Albert() NormalizableConfig {
 	a.Url = strings.Replace(a.Url, "{query}", "%s", -1)
 	a.Name = strings.Replace(a.Name, "{query}", "%s", -1)
-	a.Trigger = a.Trigger + " "
+	a.Trigger = strings.Trim(a.Trigger, Spacer) + Spacer
 	return a
 }
 
-func (a AlfredSite) Id() Id {
-	n := a.Normalize().(AlfredSite)
+func (a NormalizableConfig) Id() Id {
+	n := a.Normalize()
 	b := bytes.Buffer{}
 	b.WriteString(n.Trigger)
 	b.WriteString(n.Url)
 	return sha1.Sum(b.Bytes())
 }
 
-type AlbertSites []AlbertSite
+func (a NormalizableConfig) Alfred() NormalizableConfig {
+	a.Url = strings.Replace(a.Url, "%s", "{query}", -1)
+	a.Name = strings.Replace(a.Name, "%s", "{query}", -1)
+	a.Trigger = strings.Trim(a.Trigger, Spacer)
+	return a
+}
+
+type CustomSites map[string]NormalizableConfig
+type AlfredSites struct {
+	CustomSites `plist:"customSites"`
+}
+
+func (a AlfredSites) Convert(dict ConfigDict) AlfredSites {
+	config := make(CustomSites)
+	for _, c := range dict {
+		// @TODO Find a UUID from CustomSites to preserve the original UUID
+		config[uuid.New().String()] = c.Alfred()
+	}
+	return AlfredSites{config}
+}
+
+type AlbertSites []NormalizableConfig
 
 func (a AlbertSites) Convert(dict ConfigDict) []NormalizableConfig {
 	var configs []NormalizableConfig
 	for _, c := range dict {
-		configs = append(configs, c)
+		configs = append(configs, c.Albert())
 	}
 	return configs
-}
-
-type AlbertSite struct {
-	IconPath string `json:"iconPath"`
-	Name     string `json:"name"`
-	Trigger  string `json:"trigger"`
-	Url      string `json:"url"`
-}
-
-func (a AlbertSite) Normalize() NormalizableConfig {
-	return a
-}
-
-func (a AlbertSite) Id() Id {
-	n := a.Normalize().(AlbertSite)
-	b := bytes.Buffer{}
-	b.WriteString(n.Trigger)
-	b.WriteString(n.Url)
-	return sha1.Sum(b.Bytes())
 }
 
 func (w *Web) parse(launcher *Launcher) error {
@@ -243,30 +244,33 @@ func (w *Web) printDiff() error {
 	return nil
 }
 
+const Indent = "  "
+
 func (w *Web) applyChange() error {
 	for _, launcher := range w.Launchers {
 		switch launcher.Type {
 		case Alfred:
 			{
-				//// Wrong dict key and invalid query format
-				//// No enough information to build plist
-				//data := &bytes.Buffer{}
-				//encoder := plist.NewEncoder(data)
-				//err := encoder.Encode(w.ConfigDict)
-				//if err != nil {
-				//	fmt.Println(err)
-				//}
-				//if err := ioutil.WriteFile(
-				//	launcher.ConfigPath,
-				//	data.Bytes(),
-				//	launcher.FileInfo.Mode()); err != nil {
-				//	return err
-				//}
+				// Wrong dict key and invalid query format
+				// No enough information to build plist
+				data := &bytes.Buffer{}
+				encoder := plist.NewEncoder(data)
+				encoder.Indent(Indent)
+				if err := encoder.Encode(
+					w.AlfredSites.Convert(w.ConfigDict)); err != nil {
+					return err
+				}
+				if err := ioutil.WriteFile(
+					launcher.ConfigPath,
+					data.Bytes(),
+					launcher.FileInfo.Mode()); err != nil {
+					return err
+				}
 			}
 		case Albert:
 			{
 				j, err := json.MarshalIndent(
-					w.AlbertSites.Convert(w.ConfigDict), "", "  ")
+					w.AlbertSites.Convert(w.ConfigDict), "", Indent)
 				if err != nil {
 					return err
 				}
