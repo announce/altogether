@@ -2,15 +2,15 @@ package web
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
-	"os"
 	"strings"
 )
 
 type AlbertSites []*SiteConfig
 
-func (a *AlbertSites) Decode(file *os.File) error {
-	b, err := ioutil.ReadAll(file)
+func (a *AlbertSites) Decode(r io.ReadSeeker) error {
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}

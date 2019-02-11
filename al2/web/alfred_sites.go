@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"github.com/DHowett/go-plist"
 	"github.com/google/uuid"
-	"os"
+	"io"
 )
 
 type CustomSites map[string]*SiteConfig
@@ -12,8 +12,8 @@ type AlfredSites struct {
 	CustomSites `plist:"customSites"`
 }
 
-func (a *AlfredSites) Decode(file *os.File) error {
-	decoder := plist.NewDecoder(file)
+func (a *AlfredSites) Decode(r io.ReadSeeker) error {
+	decoder := plist.NewDecoder(r)
 	if err := decoder.Decode(a); err != nil {
 		return err
 	}
