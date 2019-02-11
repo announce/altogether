@@ -4,10 +4,8 @@ import (
 	"flag"
 	"github.com/ToQoz/gopwt"
 	"github.com/ToQoz/gopwt/assert"
-	"go/build"
+	"github.com/announce/altogether/al2/helper"
 	"os"
-	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -20,28 +18,15 @@ func TestMain(m *testing.M) {
 func TestWeb_Sync(t *testing.T) {
 	pair := &Pair{&Launcher{
 		Type:     Alfred,
-		BasePath: filepath.Join(fetchProjectRootPath(), "testdata/Alfred.alfredpreferences"),
+		BasePath: helper.MustProjectPath("testdata/Alfred.alfredpreferences"),
 	},
 		&Launcher{
 			Type:     Albert,
-			BasePath: filepath.Join(fetchProjectRootPath(), "testdata/albert"),
+			BasePath: helper.MustProjectPath("testdata/albert"),
 		}}
 	web := Web{Launchers: pair}
-	t.Run("it works with dry-run option", func(t *testing.T) {
-		err := web.Sync(Option{DtyRun: true, Verbose: true})
-		assert.OK(t, err == nil)
-	})
-	t.Run("it works", func(t *testing.T) {
+	t.Run("it works with no dry-run option", func(t *testing.T) {
 		err := web.Sync(Option{DtyRun: false, Verbose: true})
 		assert.OK(t, err == nil)
 	})
-}
-
-func fetchProjectRootPath() string {
-	goPath := os.Getenv("GOPATH")
-	if goPath == "" {
-		goPath = build.Default.GOPATH
-	}
-	s := strings.Split(goPath, ":")
-	return filepath.Join(s[len(s)-1], "src/github.com/announce/altogether")
 }

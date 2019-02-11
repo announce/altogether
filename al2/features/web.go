@@ -8,7 +8,6 @@ import (
 	"github.com/DHowett/go-plist"
 	"github.com/announce/altogether/al2/util"
 	"github.com/google/uuid"
-
 	"io/ioutil"
 	"log"
 	"os"
@@ -59,11 +58,11 @@ func (p Pair) Less(i, j int) bool {
 }
 
 type Id [sha1.Size]byte
-type ConfigDict map[Id]NormalizableConfig
+type ConfigDict map[Id]*NormalizableConfig
 type Web struct {
 	log       *log.Logger
 	Launchers *Pair
-	AlfredSites
+	*AlfredSites
 	AlbertSites
 	ConfigDict
 }
@@ -85,11 +84,10 @@ func (w *Web) Sync(option Option) error {
 			return err
 		}
 	}
-	sort.Sort(w.Launchers)
 	w.merge()
 	if option.Verbose {
 		w.log.Printf("Launchers: (0,1)=(%v,%v)", w.Launchers[0].Type, w.Launchers[1].Type)
-		w.log.Printf("ConfigDict: %+v", w.ConfigDict)
+		w.log.Printf("ConfigDict count: %v", len(w.ConfigDict))
 		w.log.Printf("DtyRun: %v", option.DtyRun)
 	}
 	if option.DtyRun {
@@ -111,7 +109,8 @@ func (w *Web) init() {
 	for _, launcher := range w.Launchers {
 		launcher.ConfigPath = filepath.Join(launcher.BasePath, ConfigPath[launcher.Type])
 	}
-	w.ConfigDict = make(map[Id]NormalizableConfig)
+	w.AlfredSites = &AlfredSites{}
+	w.ConfigDict = make(map[Id]*NormalizableConfig)
 }
 
 func (w *Web) load() error {
@@ -126,6 +125,7 @@ func (w *Web) load() error {
 }
 
 type NormalizableConfig struct {
+	Uuid     string
 	Enabled  bool   `plist:"enabled" json:"-"`
 	Utf8     bool   `plist:"utf8" json:"-"`
 	Trigger  string `plist:"keyword" json:"trigger"`
@@ -134,56 +134,64 @@ type NormalizableConfig struct {
 	IconPath string `plist:"-" json:"iconPath"`
 }
 
-func (a NormalizableConfig) Normalize() NormalizableConfig {
-	return a.Albert()
+func (a *NormalizableConfig) Id() Id {
+	a.Normalize()
+	b := bytes.Buffer{}
+	b.WriteString(a.Trigger)
+	b.WriteString(a.Url)
+	return sha1.Sum(b.Bytes())
+}
+
+func (a *NormalizableConfig) PreserveUuid(key string) {
+	a.Uuid = key
+}
+
+func (a *NormalizableConfig) Normalize() {
+	a.Albert()
 }
 
 const Spacer = " "
 
-func (a NormalizableConfig) Albert() NormalizableConfig {
+func (a *NormalizableConfig) Albert() {
 	a.Url = strings.Replace(a.Url, "{query}", "%s", -1)
 	a.Name = strings.Replace(a.Name, "{query}", "%s", -1)
 	a.Trigger = strings.Trim(a.Trigger, Spacer) + Spacer
-	return a
 }
 
-func (a NormalizableConfig) Id() Id {
-	n := a.Normalize()
-	b := bytes.Buffer{}
-	b.WriteString(n.Trigger)
-	b.WriteString(n.Url)
-	return sha1.Sum(b.Bytes())
-}
-
-func (a NormalizableConfig) Alfred() NormalizableConfig {
+func (a *NormalizableConfig) Alfred() {
 	a.Url = strings.Replace(a.Url, "%s", "{query}", -1)
 	a.Name = strings.Replace(a.Name, "%s", "{query}", -1)
 	a.Trigger = strings.Trim(a.Trigger, Spacer)
-	return a
 }
 
-type CustomSites map[string]NormalizableConfig
+type CustomSites map[string]*NormalizableConfig
 type AlfredSites struct {
 	CustomSites `plist:"customSites"`
 }
 
-func (a AlfredSites) Convert(dict ConfigDict) AlfredSites {
-	config := make(CustomSites)
-	for _, c := range dict {
-		// @TODO Find a UUID from CustomSites to preserve the original UUID
-		config[uuid.New().String()] = c.Alfred()
+func (a *AlfredSites) Convert(dict ConfigDict) AlfredSites {
+	sites := make(CustomSites)
+	for _, site := range dict {
+		config := site
+		if config.Uuid == "" {
+			config.Uuid = uuid.New().String()
+		}
+		config.Alfred()
+		sites[config.Uuid] = config
 	}
-	return AlfredSites{config}
+	return AlfredSites{sites}
 }
 
-type AlbertSites []NormalizableConfig
+type AlbertSites []*NormalizableConfig
 
-func (a AlbertSites) Convert(dict ConfigDict) []NormalizableConfig {
-	var configs []NormalizableConfig
-	for _, c := range dict {
-		configs = append(configs, c.Albert())
+func (a *AlbertSites) Convert(dict ConfigDict) AlbertSites {
+	var sites AlbertSites
+	for _, site := range dict {
+		config := site
+		config.Albert()
+		sites = append(sites, config)
 	}
-	return configs
+	return sites
 }
 
 func (w *Web) parse(launcher *Launcher) error {
@@ -202,7 +210,9 @@ func (w *Web) parse(launcher *Launcher) error {
 	case Alfred:
 		{
 			decoder := plist.NewDecoder(file)
-			return decoder.Decode(&w.AlfredSites)
+			if err := decoder.Decode(w.AlfredSites); err != nil {
+				return err
+			}
 		}
 	case Albert:
 		{
@@ -220,18 +230,21 @@ func (w *Web) parse(launcher *Launcher) error {
 
 func (w *Web) merge() {
 	// @TODO interception mode
+	sort.Sort(w.Launchers)
 	for _, launcher := range w.Launchers {
 		switch launcher.Type {
 		case Alfred:
 			{
-				for _, v := range w.AlfredSites.CustomSites {
-					w.ConfigDict[v.Id()] = v.Normalize()
+
+				for k, v := range w.AlfredSites.CustomSites {
+					v.PreserveUuid(k)
+					w.ConfigDict[v.Id()] = v
 				}
 			}
 		case Albert:
 			{
 				for _, v := range w.AlbertSites {
-					w.ConfigDict[v.Id()] = v.Normalize()
+					w.ConfigDict[v.Id()] = v
 				}
 			}
 		default:
@@ -251,8 +264,6 @@ func (w *Web) applyChange() error {
 		switch launcher.Type {
 		case Alfred:
 			{
-				// Wrong dict key and invalid query format
-				// No enough information to build plist
 				data := &bytes.Buffer{}
 				encoder := plist.NewEncoder(data)
 				encoder.Indent(Indent)
@@ -260,26 +271,28 @@ func (w *Web) applyChange() error {
 					w.AlfredSites.Convert(w.ConfigDict)); err != nil {
 					return err
 				}
-				if err := ioutil.WriteFile(
-					launcher.ConfigPath,
-					data.Bytes(),
-					launcher.FileInfo.Mode()); err != nil {
-					return err
-				}
+				//if err := ioutil.WriteFile(
+				//	launcher.ConfigPath,
+				//	data.Bytes(),
+				//	launcher.FileInfo.Mode()); err != nil {
+				//	return err
+				//}
+				return nil
 			}
 		case Albert:
 			{
-				j, err := json.MarshalIndent(
-					w.AlbertSites.Convert(w.ConfigDict), "", Indent)
-				if err != nil {
-					return err
-				}
-				if err := ioutil.WriteFile(
-					launcher.ConfigPath,
-					j,
-					launcher.FileInfo.Mode()); err != nil {
-					return err
-				}
+				//j, err := json.MarshalIndent(
+				//	w.AlbertSites.Convert(w.ConfigDict), "", Indent)
+				//if err != nil {
+				//	return err
+				//}
+				//if err := ioutil.WriteFile(
+				//	launcher.ConfigPath,
+				//	j,
+				//	launcher.FileInfo.Mode()); err != nil {
+				//	return err
+				//}
+				return nil
 			}
 		default:
 			w.log.Fatalln("Unexpected type.")

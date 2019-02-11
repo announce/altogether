@@ -31,9 +31,9 @@ var optionFlags = []cli.Flag{
 		EnvVar: "AL2_PATH_TO_ALBERT",
 	},
 	cli.BoolFlag{
-		Name:   "daemon",
-		Usage:  "Sync configurations based on file change detection",
-		EnvVar: "AL2_DAEMON",
+		Name:   "verbose",
+		Usage:  "Print out verbose logs",
+		EnvVar: "AL2_VERBOSE",
 	},
 }
 
@@ -42,8 +42,8 @@ func ExecSync(c *cli.Context) error {
 		AlfredPath: c.String("alfred-path"),
 		AlbertPath: c.String("albert-path"),
 		Mode: &Mode{
-			Daemon: c.Bool("daemon"),
-			DryRun: c.Bool("dry-run"),
+			DryRun:  c.Bool("dry-run"),
+			Verbose: c.Bool("verbose"),
 		},
 	}
 	return h.Perform()
