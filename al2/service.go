@@ -1,8 +1,8 @@
 package al2
 
 import (
-	"github.com/announce/altogether/al2/features"
 	"github.com/announce/altogether/al2/util"
+	"github.com/announce/altogether/al2/web"
 	"log"
 )
 
@@ -21,16 +21,16 @@ type Handler struct {
 func (h *Handler) Perform() error {
 	h.init()
 	h.log.Println("Starting with option: ", h.Mode)
-	pair := &al2.Pair{&al2.Launcher{
-		Type:     al2.Alfred,
+	pair := &web.Pair{&web.Launcher{
+		Type:     web.Alfred,
 		BasePath: h.AlfredPath,
 	},
-		&al2.Launcher{
-			Type:     al2.Albert,
+		&web.Launcher{
+			Type:     web.Albert,
 			BasePath: h.AlbertPath,
 		}}
-	web := &al2.Web{Launchers: pair}
-	return web.Sync(al2.Option{
+	w := &web.Web{Launchers: pair}
+	return w.Sync(web.Option{
 		DtyRun:  h.Mode.DryRun,
 		Verbose: h.Mode.Verbose,
 	})
