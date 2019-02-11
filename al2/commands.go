@@ -45,6 +45,8 @@ func ExecSync(c *cli.Context) error {
 			DryRun:  c.Bool("dry-run"),
 			Verbose: c.Bool("verbose"),
 		},
+		Writer:    c.App.Writer,
+		ErrWriter: c.App.ErrWriter,
 	}
 	return h.Perform()
 }
