@@ -47,5 +47,5 @@ func (w *Web) Sync(option Option) error {
 
 func (w *Web) init() {
 	w.log = util.CreateLogger(w.ErrOut, w)
-	w.ConfigDict = make(map[Id]*SiteConfig)
+	w.ConfigDict = make(ConfigDict)
 }

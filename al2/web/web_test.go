@@ -5,27 +5,31 @@ import (
 	"flag"
 	"github.com/ToQoz/gopwt"
 	"github.com/ToQoz/gopwt/assert"
+	"github.com/announce/altogether/al2/domain"
 	"github.com/announce/altogether/al2/helper"
 	"os"
+	"strings"
 	"testing"
 )
 
 func TestMain(m *testing.M) {
 	flag.Parse()
 	gopwt.Empower()
+	defer helper.MustRemoveTmpDir()
 	os.Exit(m.Run())
 }
 
 func TestWeb_Sync(t *testing.T) {
+	defer helper.MustRemoveTmpDir()
 	out := bytes.Buffer{}
 	errOut := out
 	pair := &Pair{&Launcher{
-		Type:     Alfred,
-		BasePath: helper.MustProjectPath("testdata/Alfred.alfredpreferences"),
+		Type:     domain.Alfred,
+		BasePath: helper.EnsureDataPath(domain.Alfred, Config),
 	},
 		&Launcher{
-			Type:     Albert,
-			BasePath: helper.MustProjectPath("testdata/albert"),
+			Type:     domain.Albert,
+			BasePath: helper.EnsureDataPath(domain.Albert, Config),
 		}}
 	web := Web{
 		Launchers: pair,
@@ -33,7 +37,13 @@ func TestWeb_Sync(t *testing.T) {
 		ErrOut:    &errOut,
 	}
 	t.Run("it works with no dry-run option", func(t *testing.T) {
-		err := web.Sync(Option{DtyRun: false, Verbose: true})
+		err := web.Sync(Option{DtyRun: false, Verbose: false})
 		assert.OK(t, err == nil)
+		assert.OK(t, web.ConfigDict != nil)
+	})
+	t.Run("it works with dry-run option", func(t *testing.T) {
+		err := web.Sync(Option{DtyRun: true, Verbose: true})
+		assert.OK(t, err == nil)
+		assert.OK(t, strings.Count(out.String(), "\n") == len(web.ConfigDict))
 	})
 }

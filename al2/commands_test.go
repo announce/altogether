@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/ToQoz/gopwt"
 	"github.com/ToQoz/gopwt/assert"
+	"github.com/announce/altogether/al2/helper"
 	"os"
 	"testing"
 )
@@ -11,6 +12,7 @@ import (
 func TestMain(m *testing.M) {
 	flag.Parse()
 	gopwt.Empower()
+	defer helper.MustRemoveTmpDir()
 	os.Exit(m.Run())
 }
 

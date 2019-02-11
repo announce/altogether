@@ -1,6 +1,7 @@
 package al2
 
 import (
+	"github.com/announce/altogether/al2/domain"
 	"github.com/announce/altogether/al2/util"
 	"github.com/announce/altogether/al2/web"
 	"io"
@@ -25,11 +26,11 @@ func (h *Handler) Perform() error {
 	h.init()
 	h.log.Println("Starting with option: ", h.Mode)
 	pair := &web.Pair{&web.Launcher{
-		Type:     web.Alfred,
+		Type:     domain.Alfred,
 		BasePath: h.AlfredPath,
 	},
 		&web.Launcher{
-			Type:     web.Albert,
+			Type:     domain.Albert,
 			BasePath: h.AlbertPath,
 		}}
 	w := &web.Web{
