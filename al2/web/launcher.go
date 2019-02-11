@@ -1,77 +1,27 @@
 package web
 
 import (
-	"errors"
 	"fmt"
+	"github.com/announce/altogether/al2/domain"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sort"
+	"time"
 )
 
-var ConfigPath = map[Type]string{
-	Alfred: "preferences/features/websearch/prefs.plist",
-	Albert: "org.albert.extension.websearch/engines.json",
+type ConfigPath map[domain.Type]string
+
+var Config = ConfigPath{
+	domain.Alfred: "preferences/features/websearch/prefs.plist",
+	domain.Albert: "org.albert.extension.websearch/engines.json",
 }
 
-var UnexpectedType = errors.New("unexpected type")
-
-type Type int
-
-const (
-	Alfred Type = iota
-	Albert
-)
-
-func (t Type) String() string {
-	return [...]string{"Alfred", "Albert"}[t]
-}
-
-type Pair [2]*Launcher
-
-func (p *Pair) Len() int {
-	return len(p)
-}
-
-func (p *Pair) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
-}
-
-func (p *Pair) Less(i, j int) bool {
-	return p[i].Mtime() < p[j].Mtime()
-}
-
-func (p *Pair) Load() error {
-	for _, launcher := range p {
-		launcher.Init()
-		if err := launcher.Load(); err != nil {
-			return err
-		}
-		if err := launcher.Parse(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (p *Pair) Merge(dict ConfigDict) {
-	sort.Sort(p)
-	for _, launcher := range p {
-		launcher.Populate(dict)
-	}
-}
-
-func (p *Pair) Save(dict ConfigDict) error {
-	for _, launcher := range p {
-		if err := launcher.Save(dict); err != nil {
-			return err
-		}
-	}
-	return nil
+func (c ConfigPath) Path(p domain.Type) string {
+	return c[p]
 }
 
 type Launcher struct {
-	Type       Type
+	Type       domain.Type
 	BasePath   string
 	ConfigPath string
 	FileInfo   os.FileInfo
@@ -81,7 +31,7 @@ type Launcher struct {
 
 func (l *Launcher) Init() {
 	l.AlfredSites = &AlfredSites{}
-	l.ConfigPath = filepath.Join(l.BasePath, ConfigPath[l.Type])
+	l.ConfigPath = filepath.Join(l.BasePath, Config[l.Type])
 }
 
 func (l *Launcher) Load() error {
@@ -93,8 +43,8 @@ func (l *Launcher) Load() error {
 	return nil
 }
 
-func (l *Launcher) Mtime() int64 {
-	return l.FileInfo.ModTime().Unix()
+func (l *Launcher) Mtime() time.Time {
+	return l.FileInfo.ModTime()
 }
 
 func (l *Launcher) Parse() error {
@@ -110,16 +60,16 @@ func (l *Launcher) Parse() error {
 		err = fmt.Errorf("failed to close: %v, the original error: %v", c, err)
 	}()
 	switch l.Type {
-	case Alfred:
+	case domain.Alfred:
 		{
 			return l.AlfredSites.Decode(file)
 		}
-	case Albert:
+	case domain.Albert:
 		{
 			return l.AlbertSites.Decode(file)
 		}
 	default:
-		panic(UnexpectedType)
+		panic(domain.UnexpectedType)
 	}
 	return nil
 }
@@ -127,21 +77,21 @@ func (l *Launcher) Parse() error {
 func (l *Launcher) Populate(dict ConfigDict) {
 	// @TODO interception mode to sync deleted config
 	switch l.Type {
-	case Alfred:
+	case domain.Alfred:
 		{
 			for k, v := range l.AlfredSites.CustomSites {
 				v.PreserveUuid(k)
 				dict[v.Id()] = v
 			}
 		}
-	case Albert:
+	case domain.Albert:
 		{
 			for _, v := range l.AlbertSites {
 				dict[v.Id()] = v
 			}
 		}
 	default:
-		panic(UnexpectedType)
+		panic(domain.UnexpectedType)
 	}
 
 }
@@ -149,9 +99,9 @@ func (l *Launcher) Populate(dict ConfigDict) {
 func (l *Launcher) Save(dict ConfigDict) error {
 	var output []byte
 	var err error
-	if l.Type == Alfred {
+	if l.Type == domain.Alfred {
 		output, err = l.AlfredSites.Encode(dict)
-	} else if l.Type == Albert {
+	} else if l.Type == domain.Albert {
 		output, err = l.AlbertSites.Encode(dict)
 	}
 	if err != nil {
