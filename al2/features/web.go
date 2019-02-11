@@ -91,7 +91,7 @@ func (w *Web) Sync(option Option) error {
 		w.log.Printf("DtyRun: %v", option.DtyRun)
 	}
 	if option.DtyRun {
-		if err := w.printDiff(); err != nil {
+		if err := w.printMerged(); err != nil {
 			w.log.Printf("[Error] Failed to print diff: %v", err)
 			return err
 		}
@@ -125,7 +125,7 @@ func (w *Web) load() error {
 }
 
 type NormalizableConfig struct {
-	Uuid     string
+	Uuid     string `plist:"-" json:"-"`
 	Enabled  bool   `plist:"enabled" json:"-"`
 	Utf8     bool   `plist:"utf8" json:"-"`
 	Trigger  string `plist:"keyword" json:"trigger"`
@@ -229,7 +229,7 @@ func (w *Web) parse(launcher *Launcher) error {
 }
 
 func (w *Web) merge() {
-	// @TODO interception mode
+	// @TODO interception mode to sync deleted config
 	sort.Sort(w.Launchers)
 	for _, launcher := range w.Launchers {
 		switch launcher.Type {
@@ -253,7 +253,13 @@ func (w *Web) merge() {
 	}
 }
 
-func (w *Web) printDiff() error {
+func (w *Web) printMerged() error {
+	// @TODO user given file to print out
+	for _, config := range w.ConfigDict {
+		if _, err := fmt.Printf("%#v\n", config); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -271,27 +277,27 @@ func (w *Web) applyChange() error {
 					w.AlfredSites.Convert(w.ConfigDict)); err != nil {
 					return err
 				}
-				//if err := ioutil.WriteFile(
-				//	launcher.ConfigPath,
-				//	data.Bytes(),
-				//	launcher.FileInfo.Mode()); err != nil {
-				//	return err
-				//}
+				if err := ioutil.WriteFile(
+					launcher.ConfigPath,
+					data.Bytes(),
+					launcher.FileInfo.Mode()); err != nil {
+					return err
+				}
 				return nil
 			}
 		case Albert:
 			{
-				//j, err := json.MarshalIndent(
-				//	w.AlbertSites.Convert(w.ConfigDict), "", Indent)
-				//if err != nil {
-				//	return err
-				//}
-				//if err := ioutil.WriteFile(
-				//	launcher.ConfigPath,
-				//	j,
-				//	launcher.FileInfo.Mode()); err != nil {
-				//	return err
-				//}
+				j, err := json.MarshalIndent(
+					w.AlbertSites.Convert(w.ConfigDict), "", Indent)
+				if err != nil {
+					return err
+				}
+				if err := ioutil.WriteFile(
+					launcher.ConfigPath,
+					j,
+					launcher.FileInfo.Mode()); err != nil {
+					return err
+				}
 				return nil
 			}
 		default:

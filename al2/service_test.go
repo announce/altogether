@@ -12,7 +12,7 @@ func TestHandler_Perform(t *testing.T) {
 		AlbertPath: helper.MustProjectPath("testdata/albert"),
 		Mode: &Mode{
 			DryRun:  true,
-			Verbose: true,
+			Verbose: false,
 		},
 	}
 	err := h.Perform()
