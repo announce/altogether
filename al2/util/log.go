@@ -9,6 +9,6 @@ import (
 func CreateLogger(caller interface{}) *log.Logger {
 	return log.New(
 		os.Stderr,
-		fmt.Sprintf("admin-mate-cli\t%T\t", caller),
+		fmt.Sprintf("al2\t%T\t", caller),
 		log.LstdFlags|log.LUTC)
 }

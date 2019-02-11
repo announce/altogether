@@ -4,12 +4,11 @@ import (
 	"github.com/announce/altogether/al2/features"
 	"github.com/announce/altogether/al2/util"
 	"log"
-	"os"
 )
 
 type Mode struct {
-	Daemon bool
-	DryRun bool
+	DryRun  bool
+	Verbose bool
 }
 
 type Handler struct {
@@ -21,9 +20,7 @@ type Handler struct {
 
 func (h *Handler) Perform() error {
 	h.init()
-	if err := h.validate(); err != nil {
-		return err
-	}
+	h.log.Println("Starting with option: ", h.Mode)
 	pair := &al2.Pair{&al2.Launcher{
 		Type:     al2.Alfred,
 		BasePath: h.AlfredPath,
@@ -33,19 +30,12 @@ func (h *Handler) Perform() error {
 			BasePath: h.AlbertPath,
 		}}
 	web := &al2.Web{Launchers: pair}
-	return web.Sync(al2.Option{DtyRun: h.Mode.DryRun})
+	return web.Sync(al2.Option{
+		DtyRun:  h.Mode.DryRun,
+		Verbose: h.Mode.Verbose,
+	})
 }
 
 func (h *Handler) init() {
 	h.log = util.CreateLogger(h)
-}
-
-func (h *Handler) validate() error {
-	if _, err := os.Stat(h.AlfredPath); err != nil {
-		return err
-	}
-	if _, err := os.Stat(h.AlbertPath); err != nil {
-		return err
-	}
-	return nil
 }
