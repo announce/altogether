@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 type Web struct {
@@ -155,7 +156,7 @@ func (w *Web) applyChange() error {
 			{
 				data := &bytes.Buffer{}
 				encoder := plist.NewEncoder(data)
-				encoder.Indent(Indent)
+				encoder.Indent("\t")
 				if err := encoder.Encode(
 					w.AlfredSites.Convert(w.ConfigDict)); err != nil {
 					return err
@@ -171,7 +172,7 @@ func (w *Web) applyChange() error {
 		case Albert:
 			{
 				j, err := json.MarshalIndent(
-					w.AlbertSites.Convert(w.ConfigDict), "", Indent)
+					w.AlbertSites.Convert(w.ConfigDict), "", strings.Repeat(Indent, 2))
 				if err != nil {
 					return err
 				}
