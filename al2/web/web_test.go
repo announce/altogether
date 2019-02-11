@@ -1,4 +1,4 @@
-package al2
+package web
 
 import (
 	"flag"

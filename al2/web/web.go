@@ -1,64 +1,18 @@
-package al2
+package web
 
 import (
 	"bytes"
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"github.com/DHowett/go-plist"
 	"github.com/announce/altogether/al2/util"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 )
 
-type Type int
-
-const (
-	Alfred Type = iota
-	Albert
-)
-
-func (t Type) String() string {
-	return [...]string{"Alfred", "Albert"}[t]
-}
-
-var ConfigPath = map[Type]string{
-	Alfred: "preferences/features/websearch/prefs.plist",
-	Albert: "org.albert.extension.websearch/engines.json",
-}
-
-type Launcher struct {
-	Type       Type
-	BasePath   string
-	ConfigPath string
-	FileInfo   os.FileInfo
-}
-
-func (l Launcher) Mtime() int64 {
-	return l.FileInfo.ModTime().Unix()
-}
-
-type Pair [2]*Launcher
-
-func (p Pair) Len() int {
-	return len(p)
-}
-
-func (p Pair) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
-}
-
-func (p Pair) Less(i, j int) bool {
-	return p[i].Mtime() < p[j].Mtime()
-}
-
-type Id [sha1.Size]byte
-type ConfigDict map[Id]*NormalizableConfig
 type Web struct {
 	log       *log.Logger
 	Launchers *Pair
@@ -110,7 +64,7 @@ func (w *Web) init() {
 		launcher.ConfigPath = filepath.Join(launcher.BasePath, ConfigPath[launcher.Type])
 	}
 	w.AlfredSites = &AlfredSites{}
-	w.ConfigDict = make(map[Id]*NormalizableConfig)
+	w.ConfigDict = make(map[Id]*SiteConfig)
 }
 
 func (w *Web) load() error {
@@ -122,76 +76,6 @@ func (w *Web) load() error {
 		launcher.FileInfo = info
 	}
 	return nil
-}
-
-type NormalizableConfig struct {
-	Uuid     string `plist:"-" json:"-"`
-	Enabled  bool   `plist:"enabled" json:"-"`
-	Utf8     bool   `plist:"utf8" json:"-"`
-	Trigger  string `plist:"keyword" json:"trigger"`
-	Name     string `plist:"text" json:"name"`
-	Url      string `plist:"url" json:"url"`
-	IconPath string `plist:"-" json:"iconPath"`
-}
-
-func (a *NormalizableConfig) Id() Id {
-	a.Normalize()
-	b := bytes.Buffer{}
-	b.WriteString(a.Trigger)
-	b.WriteString(a.Url)
-	return sha1.Sum(b.Bytes())
-}
-
-func (a *NormalizableConfig) PreserveUuid(key string) {
-	a.Uuid = key
-}
-
-func (a *NormalizableConfig) Normalize() {
-	a.Albert()
-}
-
-const Spacer = " "
-
-func (a *NormalizableConfig) Albert() {
-	a.Url = strings.Replace(a.Url, "{query}", "%s", -1)
-	a.Name = strings.Replace(a.Name, "{query}", "%s", -1)
-	a.Trigger = strings.Trim(a.Trigger, Spacer) + Spacer
-}
-
-func (a *NormalizableConfig) Alfred() {
-	a.Url = strings.Replace(a.Url, "%s", "{query}", -1)
-	a.Name = strings.Replace(a.Name, "%s", "{query}", -1)
-	a.Trigger = strings.Trim(a.Trigger, Spacer)
-}
-
-type CustomSites map[string]*NormalizableConfig
-type AlfredSites struct {
-	CustomSites `plist:"customSites"`
-}
-
-func (a *AlfredSites) Convert(dict ConfigDict) AlfredSites {
-	sites := make(CustomSites)
-	for _, site := range dict {
-		config := site
-		if config.Uuid == "" {
-			config.Uuid = uuid.New().String()
-		}
-		config.Alfred()
-		sites[config.Uuid] = config
-	}
-	return AlfredSites{sites}
-}
-
-type AlbertSites []*NormalizableConfig
-
-func (a *AlbertSites) Convert(dict ConfigDict) AlbertSites {
-	var sites AlbertSites
-	for _, site := range dict {
-		config := site
-		config.Albert()
-		sites = append(sites, config)
-	}
-	return sites
 }
 
 func (w *Web) parse(launcher *Launcher) error {
@@ -235,7 +119,6 @@ func (w *Web) merge() {
 		switch launcher.Type {
 		case Alfred:
 			{
-
 				for k, v := range w.AlfredSites.CustomSites {
 					v.PreserveUuid(k)
 					w.ConfigDict[v.Id()] = v
@@ -254,7 +137,7 @@ func (w *Web) merge() {
 }
 
 func (w *Web) printMerged() error {
-	// @TODO user given file to print out
+	// @TODO use given filer to print out
 	for _, config := range w.ConfigDict {
 		if _, err := fmt.Printf("%#v\n", config); err != nil {
 			return err
