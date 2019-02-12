@@ -6,18 +6,6 @@ import (
 
 type Pair [2]*Launcher
 
-func (p *Pair) Len() int {
-	return len(p)
-}
-
-func (p *Pair) Swap(i, j int) {
-	p[i], p[j] = p[j], p[i]
-}
-
-func (p *Pair) Less(i, j int) bool {
-	return p[i].Mtime().Unix() < p[j].Mtime().Unix()
-}
-
 func (p *Pair) Load() error {
 	for _, launcher := range p {
 		launcher.Init()
@@ -29,6 +17,18 @@ func (p *Pair) Load() error {
 		}
 	}
 	return nil
+}
+
+func (p *Pair) Len() int {
+	return len(p)
+}
+
+func (p *Pair) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+func (p *Pair) Less(i, j int) bool {
+	return p[i].Mtime().UnixNano() < p[j].Mtime().UnixNano()
 }
 
 func (p *Pair) Merge(dict ConfigDict) {
