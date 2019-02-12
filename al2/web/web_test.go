@@ -1,4 +1,4 @@
-package web
+package web_test
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"github.com/ToQoz/gopwt"
 	"github.com/ToQoz/gopwt/assert"
 	"github.com/announce/altogether/al2/helper"
+	"github.com/announce/altogether/al2/web"
 	"os"
 	"strings"
 	"testing"
@@ -23,19 +24,19 @@ func TestWeb_Sync(t *testing.T) {
 	out := bytes.Buffer{}
 	errOut := out
 	pair, _ := newPair()
-	web := Web{
+	w := web.Web{
 		Launchers: pair,
 		Out:       &out,
 		ErrOut:    &errOut,
 	}
 	t.Run("it works with no dry-run option", func(t *testing.T) {
-		err := web.Sync(Option{DtyRun: false, Verbose: false})
+		err := w.Sync(web.Option{DtyRun: false, Verbose: false})
 		assert.OK(t, err == nil)
-		assert.OK(t, web.ConfigDict != nil)
+		assert.OK(t, w.ConfigDict != nil)
 	})
 	t.Run("it works with dry-run option", func(t *testing.T) {
-		err := web.Sync(Option{DtyRun: true, Verbose: true})
+		err := w.Sync(web.Option{DtyRun: true, Verbose: true})
 		assert.OK(t, err == nil)
-		assert.OK(t, strings.Count(out.String(), "\n") == len(web.ConfigDict))
+		assert.OK(t, strings.Count(out.String(), "\n") == len(w.ConfigDict))
 	})
 }
