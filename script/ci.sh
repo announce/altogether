@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 _ci () {
-  readonly TAG_NAME="announced/search-consumer"
-  readonly TAG_VERSION="0.1.0"
+  readonly TAG_NAME="announced/altogether"
   readonly PKG_PATH="github.com/announce/altogether"
   set -e
 
@@ -11,7 +10,7 @@ _ci () {
   }
 
   build-container () {
-    docker build -t "${TAG_NAME}:${TAG_VERSION}" .
+    docker build -t "${TAG_NAME}:${TAG_VERSION:=0.1.0}" .
   }
 
   ci () {
