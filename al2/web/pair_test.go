@@ -4,7 +4,6 @@ import (
 	"github.com/ToQoz/gopwt/assert"
 	"github.com/announce/altogether/al2/domain"
 	"github.com/announce/altogether/al2/helper"
-	"log"
 	"testing"
 	"time"
 )
@@ -41,14 +40,14 @@ func TestPair_Merge(t *testing.T) {
 		assert.OK(t, pair[1].ConfigPath == path1)
 	})
 	t.Run("touch path1 first and path0 later", func(t *testing.T) {
-		log.Printf("(p1, p1)=(%v,%v)(%v, %v)",
-			pair[0].Type, pair[1].Type, pair[0].Mtime(), pair[1].Mtime())
+		//log.Printf("(p1, p1)=(%v,%v)(%v, %v)",
+		//	pair[0].Type, pair[1].Type, pair[0].Mtime(), pair[1].Mtime())
 		helper.MustTouchFile(path1, 0)
 		helper.MustTouchFile(path0, 1*time.Nanosecond)
 		_ = pair.Load()
 		pair.Merge(make(ConfigDict))
-		log.Printf("(p1, p1)=(%v,%v)(%v, %v)",
-			pair[0].Type, pair[1].Type, pair[0].Mtime(), pair[1].Mtime())
+		//log.Printf("(p1, p1)=(%v,%v)(%v, %v)",
+		//	pair[0].Type, pair[1].Type, pair[0].Mtime(), pair[1].Mtime())
 		assert.OK(t, pair[1].ConfigPath == path0)
 		assert.OK(t, pair[0].ConfigPath == path1)
 	})
