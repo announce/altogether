@@ -7,36 +7,27 @@ import (
 	"testing"
 )
 
-func newAlfred() *Launcher {
+func newLauncher(p domain.Type) *Launcher {
 	launcher := &Launcher{
-		Type:     domain.Alfred,
-		BasePath: helper.EnsureDataPath(domain.Alfred, Config),
-	}
-	launcher.Init()
-	return launcher
-}
-
-func newAlbert() *Launcher {
-	launcher := &Launcher{
-		Type:     domain.Albert,
-		BasePath: helper.EnsureDataPath(domain.Albert, Config),
+		Type:     p,
+		BasePath: helper.EnsureDataPath(p, Config),
 	}
 	launcher.Init()
 	return launcher
 }
 
 func TestLauncher_Init(t *testing.T) {
-	launcher := newAlfred()
+	launcher := newLauncher(domain.Alfred)
 	assert.OK(t, launcher != nil)
 }
 
 func TestLauncher_Load(t *testing.T) {
-	err := newAlfred().Load()
+	err := newLauncher(domain.Alfred).Load()
 	assert.OK(t, err == nil)
 }
 
 func TestLauncher_Mtime(t *testing.T) {
-	launcher := newAlfred()
+	launcher := newLauncher(domain.Alfred)
 	err := launcher.Load()
 	assert.OK(t, err == nil)
 	mtime := launcher.Mtime().String()
@@ -46,13 +37,13 @@ func TestLauncher_Mtime(t *testing.T) {
 func TestLauncher_Parse(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	t.Run("it works with Alfred", func(t *testing.T) {
-		launcher := newAlfred()
+		launcher := newLauncher(domain.Alfred)
 		err := launcher.Parse()
 		assert.OK(t, err == nil)
 		assert.OK(t, launcher.AlfredSites != nil)
 	})
 	t.Run("it works with Albert", func(t *testing.T) {
-		launcher := newAlbert()
+		launcher := newLauncher(domain.Albert)
 		err := launcher.Parse()
 		assert.OK(t, err == nil)
 		assert.OK(t, launcher.AlbertSites != nil)
@@ -63,14 +54,14 @@ func TestLauncher_Populate(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	t.Run("it works with Alfred", func(t *testing.T) {
 		dict := make(ConfigDict)
-		launcher := newAlfred()
+		launcher := newLauncher(domain.Alfred)
 		_ = launcher.Parse()
 		launcher.Populate(dict)
 		assert.OK(t, len(dict) > 0)
 	})
 	t.Run("it works with Albert", func(t *testing.T) {
 		dict := make(ConfigDict)
-		launcher := newAlbert()
+		launcher := newLauncher(domain.Albert)
 		_ = launcher.Parse()
 		launcher.Populate(dict)
 		assert.OK(t, len(dict) > 0)
@@ -81,7 +72,7 @@ func TestLauncher_Save(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	t.Run("it works with Alfred", func(t *testing.T) {
 		dict := make(ConfigDict)
-		launcher := newAlfred()
+		launcher := newLauncher(domain.Alfred)
 		_ = launcher.Load()
 		_ = launcher.Parse()
 		launcher.Populate(dict)
@@ -90,7 +81,7 @@ func TestLauncher_Save(t *testing.T) {
 	})
 	t.Run("it works with Albert", func(t *testing.T) {
 		dict := make(ConfigDict)
-		launcher := newAlbert()
+		launcher := newLauncher(domain.Albert)
 		_ = launcher.Load()
 		_ = launcher.Parse()
 		launcher.Populate(dict)
