@@ -1,7 +1,7 @@
 Altogether
 ===
 
-[![master]()](https://github.com/announce/altogether)
+[![Build Status](https://dev.azure.com/announce/altogether/_apis/build/status/announce.altogether?branchName=master)](https://dev.azure.com/announce/altogether/_build/latest?definitionId=4&branchName=master)
 
 ## Altogether in a nutshell
 
