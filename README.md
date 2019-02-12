@@ -3,16 +3,21 @@ Altogether
 
 [![Build Status](https://dev.azure.com/announce/altogether/_apis/build/status/announce.altogether?branchName=master)](https://dev.azure.com/announce/altogether/_build/latest?definitionId=4&branchName=master)
 
-## Altogether in a nutshell
+## Altogether in a Nutshell
 
-Altogether is a CLI tool to sync configuration files between 2 major keyboard launchers -- Alfred and Albert. Supported configuration files are the ones relating to:
+Altogether is a CLI tool to sync configuration files between 2 major keyboard launchers -- [Alfred](https://www.alfredapp.com/) and [Albert](https://albertlauncher.github.io/).
+So the target user is who adopts both Mac and Linux on a daily basis, or someone needs to migrate the one's config to the another.
+
+## Supported Features
+
+Supported configuration files are the ones relating to:
 
 * [x] Web search
 * [ ] Snippets
 
 ## Installation
 
-* Download package
+* The most primitive way is to download binary package
 
 ## Usage
 
