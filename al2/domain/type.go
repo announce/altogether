@@ -14,7 +14,10 @@ const (
 )
 
 func (t Type) String() string {
-	return [...]string{"Alfred", "Albert"}[t]
+	return [...]string{
+		"Alfred",
+		"Albert",
+	}[t]
 }
 
 type TypedConfig interface {
