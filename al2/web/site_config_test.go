@@ -1,20 +1,21 @@
-package web
+package web_test
 
 import (
 	"encoding/hex"
 	"github.com/ToQoz/gopwt/assert"
 	"github.com/announce/altogether/al2/domain"
+	"github.com/announce/altogether/al2/web"
 	"github.com/google/uuid"
 	"strings"
 	"testing"
 )
 
-func newSiteConfig(p domain.Type) *SiteConfig {
-	config := &SiteConfig{}
+func newSiteConfig(p domain.Type) *web.SiteConfig {
+	config := &web.SiteConfig{}
 	switch p {
 	case domain.Alfred:
 		{
-			config = &SiteConfig{
+			config = &web.SiteConfig{
 				Uuid:    strings.ToUpper(uuid.New().String()),
 				Enabled: true,
 				Utf8:    true,
@@ -25,7 +26,7 @@ func newSiteConfig(p domain.Type) *SiteConfig {
 		}
 	case domain.Albert:
 		{
-			config = &SiteConfig{
+			config = &web.SiteConfig{
 				Trigger: "jj ",
 				Name:    "Sample description",
 				Url:     "https://example.com/%s/",

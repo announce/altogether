@@ -1,16 +1,17 @@
-package web
+package web_test
 
 import (
 	"github.com/ToQoz/gopwt/assert"
 	"github.com/announce/altogether/al2/domain"
 	"github.com/announce/altogether/al2/helper"
+	"github.com/announce/altogether/al2/web"
 	"testing"
 )
 
-func newLauncher(p domain.Type) *Launcher {
-	launcher := &Launcher{
+func newLauncher(p domain.Type) *web.Launcher {
+	launcher := &web.Launcher{
 		Type:     p,
-		BasePath: helper.EnsureDataPath(p, Config),
+		BasePath: helper.EnsureDataPath(p, web.Config),
 	}
 	launcher.Init()
 	return launcher
@@ -53,14 +54,14 @@ func TestLauncher_Parse(t *testing.T) {
 func TestLauncher_Populate(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	t.Run("it works with Alfred", func(t *testing.T) {
-		dict := make(ConfigDict)
+		dict := make(web.ConfigDict)
 		launcher := newLauncher(domain.Alfred)
 		_ = launcher.Parse()
 		launcher.Populate(dict)
 		assert.OK(t, len(dict) > 0)
 	})
 	t.Run("it works with Albert", func(t *testing.T) {
-		dict := make(ConfigDict)
+		dict := make(web.ConfigDict)
 		launcher := newLauncher(domain.Albert)
 		_ = launcher.Parse()
 		launcher.Populate(dict)
@@ -71,7 +72,7 @@ func TestLauncher_Populate(t *testing.T) {
 func TestLauncher_Save(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	t.Run("it works with Alfred", func(t *testing.T) {
-		dict := make(ConfigDict)
+		dict := make(web.ConfigDict)
 		launcher := newLauncher(domain.Alfred)
 		_ = launcher.Load()
 		_ = launcher.Parse()
@@ -80,7 +81,7 @@ func TestLauncher_Save(t *testing.T) {
 		assert.OK(t, err == nil)
 	})
 	t.Run("it works with Albert", func(t *testing.T) {
-		dict := make(ConfigDict)
+		dict := make(web.ConfigDict)
 		launcher := newLauncher(domain.Albert)
 		_ = launcher.Load()
 		_ = launcher.Parse()

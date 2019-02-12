@@ -1,8 +1,9 @@
-package al2
+package al2_test
 
 import (
 	"bytes"
 	"github.com/ToQoz/gopwt/assert"
+	"github.com/announce/altogether/al2"
 	"github.com/announce/altogether/al2/domain"
 	"github.com/announce/altogether/al2/helper"
 	"github.com/announce/altogether/al2/web"
@@ -13,10 +14,10 @@ func TestHandler_Perform(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	out := bytes.Buffer{}
 	errOut := out
-	h := &Handler{
+	h := &al2.Handler{
 		AlfredPath: helper.EnsureDataPath(domain.Alfred, web.Config),
 		AlbertPath: helper.EnsureDataPath(domain.Albert, web.Config),
-		Mode: &Mode{
+		Mode: &al2.Mode{
 			DryRun:  true,
 			Verbose: false,
 		},
