@@ -5,7 +5,10 @@ Altogether
 
 ## Altogether in a nutshell
 
-Altogether is a CLI tool to sync configuration files between 2 major keyboard launchers -- Alfred and Albert.
+Altogether is a CLI tool to sync configuration files between 2 major keyboard launchers -- Alfred and Albert. Supported configuration files are the ones relating to:
+
+* [x] Web search
+* [ ] Snippets
 
 ## Installation
 
