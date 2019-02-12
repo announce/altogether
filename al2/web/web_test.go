@@ -5,7 +5,6 @@ import (
 	"flag"
 	"github.com/ToQoz/gopwt"
 	"github.com/ToQoz/gopwt/assert"
-	"github.com/announce/altogether/al2/domain"
 	"github.com/announce/altogether/al2/helper"
 	"os"
 	"strings"
@@ -23,14 +22,7 @@ func TestWeb_Sync(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	out := bytes.Buffer{}
 	errOut := out
-	pair := &Pair{&Launcher{
-		Type:     domain.Alfred,
-		BasePath: helper.EnsureDataPath(domain.Alfred, Config),
-	},
-		&Launcher{
-			Type:     domain.Albert,
-			BasePath: helper.EnsureDataPath(domain.Albert, Config),
-		}}
+	pair, _ := newPair()
 	web := Web{
 		Launchers: pair,
 		Out:       &out,

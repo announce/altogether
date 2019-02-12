@@ -30,6 +30,11 @@ func TestLauncher_Init(t *testing.T) {
 	assert.OK(t, launcher != nil)
 }
 
+func TestLauncher_Load(t *testing.T) {
+	err := newAlfred().Load()
+	assert.OK(t, err == nil)
+}
+
 func TestLauncher_Mtime(t *testing.T) {
 	launcher := newAlfred()
 	err := launcher.Load()

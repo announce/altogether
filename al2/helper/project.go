@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const ProjectPath = "src/github.com/announce/altogether"
@@ -83,4 +84,12 @@ func existingPath(paths []string, subdir string) (string, error) {
 		}
 	}
 	return "", errors.New("project path was not found")
+}
+
+func MustTouchFile(path string, waitFor time.Duration) {
+	time.Sleep(waitFor)
+	now := time.Now().Local()
+	if err := os.Chtimes(path, now, now); err != nil {
+		panic(err)
+	}
 }
