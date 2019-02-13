@@ -20,7 +20,11 @@ _ci () {
   }
 
   _ () {
-    docker run --rm --interactive --volume "${PWD}:/go/src/${PKG_PATH}" "${TAG_NAME}:${TAG_VERSION}" "$@"
+    echo "ASSET_DIR:${ASSET_DIR}"
+    docker run --rm --interactive \
+      --env ASSET_DIR="${ASSET_DIR:=pkg}" \
+      --volume "${PWD}:/go/src/${PKG_PATH}" \
+      "${TAG_NAME}:${TAG_VERSION}" "$@"
   }
 
   release () {
