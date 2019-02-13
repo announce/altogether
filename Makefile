@@ -1,6 +1,6 @@
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
 
-VERSION ?= $$(git describe --tags --always --dirty) ($$(git name-rev --name-only HEAD))
+VERSION ?= $$(./script/ci.sh version))
 BUILD_FLAGS := -ldflags "\
 	      -X \"main.Version=$(VERSION)\" \
 	      "

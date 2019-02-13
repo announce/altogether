@@ -4,47 +4,51 @@ import (
 	"github.com/announce/altogether/al2/domain"
 	"github.com/announce/altogether/al2/util"
 	"github.com/announce/altogether/al2/web"
-	"io"
+	"github.com/pkg/errors"
+	"github.com/urfave/cli"
 	"log"
+	"strings"
 )
 
-type Mode struct {
-	DryRun  bool
-	Verbose bool
-}
-
 type Handler struct {
-	log        *log.Logger
-	AlfredPath string
-	AlbertPath string
-	Mode       *Mode
-	Writer     io.Writer
-	ErrWriter  io.Writer
+	log *log.Logger
 }
 
-func (h *Handler) Perform() error {
-	h.init()
-	h.log.Println("Starting with option: ", h.Mode)
+func (h *Handler) SyncWeb(c *cli.Context) error {
+	h.log = util.CreateLogger(c.App.ErrWriter, h)
+	h.log.Printf("Starting sync-web with option: %#v", c)
+	if err := h.verifyRequiredParams(c); err != nil {
+		return err
+	}
 	pair := &web.Pair{&web.Launcher{
 		Type:     domain.Alfred,
-		BasePath: h.AlfredPath,
+		BasePath: c.String("alfred-path"),
 	},
 		&web.Launcher{
 			Type:     domain.Albert,
-			BasePath: h.AlbertPath,
+			BasePath: c.String("albert-path"),
 		}}
 	w := &web.Web{
 		Launchers: pair,
-		Out:       h.Writer,
-		ErrOut:    h.ErrWriter,
+		Out:       c.App.Writer,
+		ErrOut:    c.App.ErrWriter,
 	}
 	return w.Sync(web.Option{
-		DtyRun:  h.Mode.DryRun,
-		Verbose: h.Mode.Verbose,
+		DtyRun:  c.Bool("dry-run"),
+		Verbose: c.Bool("verbose"),
 	})
 }
 
-func (h *Handler) init() {
-	h.log = util.CreateLogger(h.ErrWriter, h)
-	h.log.Println("ErrOut:", h.ErrWriter)
+func (h *Handler) verifyRequiredParams(c *cli.Context) error {
+	var messages []string
+	if c.String("alfred-path") == "" {
+		messages = append(messages, "specify required option: alfred-path")
+	}
+	if c.String("albert-path") == "" {
+		messages = append(messages, "specify required option: albert-path")
+	}
+	if len(messages) > 0 {
+		return errors.New(strings.Join(messages, "\n"))
+	}
+	return nil
 }

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 _ci () {
-  readonly TAG_NAME="announced/altogether"
-  readonly PKG_PATH="github.com/announce/altogether"
+  TAG_NAME="announced/altogether"
+  PKG_PATH="github.com/announce/altogether"
+  TAG_VERSION="${TAG_VERSION:=0.1.0}"
   set -e
 
   init () {
@@ -10,7 +11,7 @@ _ci () {
   }
 
   build-container () {
-    docker build -t "${TAG_NAME}:${TAG_VERSION:=0.1.0}" .
+    docker build -t "${TAG_NAME}:${TAG_VERSION}" .
   }
 
   ci () {
@@ -30,6 +31,10 @@ _ci () {
     MESSAGE="${1:-Something went wrong.}"
     echo "[$(basename "$0")] ERROR: ${MESSAGE}" >&2
     exit 1
+  }
+
+  version () {
+    echo "$(git describe --tags --always --dirty) ($(git name-rev --name-only HEAD))"
   }
 
   usage () {
