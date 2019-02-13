@@ -28,7 +28,7 @@ var optionFlags = []cli.Flag{
 	cli.BoolFlag{
 		Name:   "dry-run",
 		Usage:  "Print configuration diff without actual file change",
-		EnvVar: "AL2_PATH_TO_ALBERT",
+		EnvVar: "AL2_DRY_RUN",
 	},
 	cli.BoolFlag{
 		Name:   "verbose",

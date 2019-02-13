@@ -14,12 +14,8 @@ _ci () {
   }
 
   ci () {
-    lint-shell
+    make lint-shell lint-systemd
     _ make init lint build test
-  }
-
-  lint-shell () {
-    make lint-shell
   }
 
   _ () {
