@@ -5,7 +5,7 @@ Altogether
 
 ## Altogether in a Nutshell
 
-Altogether is a CLI tool to sync configuration files between 2 major keyboard launchers -- [Alfred](https://www.alfredapp.com/) and [Albert](https://albertlauncher.github.io/).
+Altogether is a CLI tool to synchronize configuration files between 2 major keyboard launchers -- [Alfred](https://www.alfredapp.com/) and [Albert](https://albertlauncher.github.io/).
 So the target user is who adopts both Mac and Linux on a daily basis, or someone needs to migrate the one's config to the another.
 
 ## Supported Features
@@ -21,9 +21,11 @@ Supported configuration files are the ones relating to:
 
 ## Usage
 
-1. Prepare required parameters
-    * `AL2_ALFRED_PATH`: Specify a path to Alfred's config directory (default path is `${HOME}/.config/Alfred.alfredpreferences`)
-    * `AL2_ALBERT_PATH`: Specify a path to Albert's config directory (default path is `${HOME}/.config/albert`)
+#### Command Arguments
+
+1. Specify required parameters in environmental variables
+    * `AL2_ALFRED_PATH`: a path to Alfred's config directory
+    * `AL2_ALBERT_PATH`: a path to Albert's config directory
 1. Execute commands like as following:
 
 ```bash
@@ -31,7 +33,14 @@ export AL2_ALFRED_PATH="__ALFRED_CONFIG_DIR__" AL2_ALBERT_PATH="__ALBERT_CONFIG_
 ./altogether help
 ```
 
-```text
+#### Systemd Configurations
+
+1. Refer to `./sample` directory and place unit files to `~/.config/systemd/user/`, etc
+1. Run the command like below:
+
+```bash
+systemctl --user daemon-reload && systemctl --user restart altogether
+journalctl --user -xe -u altogether
 ```
 
 ## Supported Versions

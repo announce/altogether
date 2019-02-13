@@ -6,28 +6,30 @@ import (
 
 var Commands = []cli.Command{
 	{
-		Name:        "sync",
-		Usage:       "Sync configuration files",
-		Description: ``,
-		Action:      ExecSync,
-		Flags:       optionFlags,
+		Name:  "sync-web",
+		Usage: "Sync web-search configs",
+		Description: `Required params:
+	--alfred-path
+	--albert-path`,
+		Action: func(c *cli.Context) error { return (&Handler{}).SyncWeb(c) },
+		Flags:  optionFlags,
 	},
 }
 
 var optionFlags = []cli.Flag{
 	cli.StringFlag{
 		Name:   "alfred-path",
-		Usage:  "Specify path to Alfred configuration root directory",
+		Usage:  "Specify path to Alfred configuration's root directory",
 		EnvVar: "AL2_ALFRED_PATH",
 	},
 	cli.StringFlag{
 		Name:   "albert-path",
-		Usage:  "Specify path to Albert configuration root directory",
+		Usage:  "Specify path to Albert configuration's root directory",
 		EnvVar: "AL2_ALBERT_PATH",
 	},
 	cli.BoolFlag{
 		Name:   "dry-run",
-		Usage:  "Print configuration diff without actual file change",
+		Usage:  "Print merged configurations without actual file change",
 		EnvVar: "AL2_DRY_RUN",
 	},
 	cli.BoolFlag{
@@ -35,18 +37,4 @@ var optionFlags = []cli.Flag{
 		Usage:  "Print out verbose logs",
 		EnvVar: "AL2_VERBOSE",
 	},
-}
-
-func ExecSync(c *cli.Context) error {
-	h := &Handler{
-		AlfredPath: c.String("alfred-path"),
-		AlbertPath: c.String("albert-path"),
-		Mode: &Mode{
-			DryRun:  c.Bool("dry-run"),
-			Verbose: c.Bool("verbose"),
-		},
-		Writer:    c.App.Writer,
-		ErrWriter: c.App.ErrWriter,
-	}
-	return h.Perform()
 }
