@@ -1,6 +1,6 @@
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
 
-VERSION ?= $$(./script/ci.sh version))
+VERSION ?= $$(./script/ci.sh version)
 BUILD_FLAGS := -ldflags "\
 	      -X \"main.Version=$(VERSION)\" \
 	      "
@@ -26,8 +26,7 @@ lint:
 
 release:
 	go get -v github.com/mitchellh/gox
-	VERSION="$(VERSION)" ./script/release.sh
-	VERSION="$(VERSION)" ./script/distribution.sh
+	VERSION="$(VERSION)" ASSET_DIR="$(ASSET_DIR)" ./script/release.sh
 	touch pkg/.gitkeep
 
 $(GO_TESTED): $(GO_FILES)

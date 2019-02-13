@@ -3,7 +3,7 @@
 _ci () {
   TAG_NAME="announced/altogether"
   PKG_PATH="github.com/announce/altogether"
-  TAG_VERSION="${TAG_VERSION:=0.1.0}"
+  TAG_VERSION="${TAG_VERSION:=0.0.0}"
   set -e
 
   init () {
@@ -15,7 +15,7 @@ _ci () {
   }
 
   ci () {
-    make lint-shell lint-systemd
+    make lint-shell lint-yaml
     _ make init lint build test
   }
 
@@ -24,7 +24,7 @@ _ci () {
   }
 
   release () {
-    make init release
+    _ make init release
   }
 
   _fatal () {
