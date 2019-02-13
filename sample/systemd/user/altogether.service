@@ -1,0 +1,12 @@
+;https://www.freedesktop.org/software/systemd/man/systemd.directives.html
+[Unit]
+Description=Altogether
+Wants=systemd-networkd-wait-online.service
+
+[Service]
+Environment=AL2_VERBOSE=1
+Environment=AL2_DRY_RUN=1
+Environment=AL2_ALFRED_PATH=/home/i05/.config/Alfred.alfredpreferences
+Environment=AL2_ALBERT_PATH=/home/i05/.config/albert
+;ExecStart=/usr/bin/altogether sync
+ExecStart=/home/i05/src/github.com/announce/altogether/altogether sync

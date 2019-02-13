@@ -1,0 +1,9 @@
+;https://www.freedesktop.org/software/systemd/man/systemd.directives.html
+[Unit]
+Description=Altogether Config Modification Detector
+
+[Path]
+Unit=altogether.service
+PathChanged=/home/i05/.config/Alfred.alfredpreferences/preferences/features/websearch/prefs.plist
+PathChanged=/home/i05/.config/albert/org.albert.extension.websearch/engines.json
+;PathModified=
