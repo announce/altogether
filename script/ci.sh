@@ -3,7 +3,7 @@
 _ci () {
   TAG_NAME="announced/altogether"
   PKG_PATH="github.com/announce/altogether"
-  TAG_VERSION="${TAG_VERSION:=0.1.0}"
+  TAG_VERSION="${TAG_VERSION:=0.0.0}"
   set -e
 
   init () {
@@ -15,16 +15,20 @@ _ci () {
   }
 
   ci () {
-    make lint-shell lint-systemd
+    make lint-shell lint-yaml
     _ make init lint build test
   }
 
   _ () {
-    docker run --rm --interactive --volume "${PWD}:/go/src/${PKG_PATH}" "${TAG_NAME}:${TAG_VERSION}" "$@"
+    echo "ASSET_DIR:${ASSET_DIR}"
+    docker run --rm --interactive \
+      --env ASSET_DIR="${ASSET_DIR:=pkg}" \
+      --volume "${PWD}:/go/src/${PKG_PATH}" \
+      "${TAG_NAME}:${TAG_VERSION}" "$@"
   }
 
   release () {
-    make init release
+    _ make init release
   }
 
   _fatal () {
