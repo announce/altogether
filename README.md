@@ -6,7 +6,7 @@ Altogether
 ## Altogether in a Nutshell
 
 Altogether is a CLI tool to synchronize configuration files between 2 major keyboard launchers -- [Alfred](https://www.alfredapp.com/) and [Albert](https://albertlauncher.github.io/).
-So the target user is who adopts both Mac and Linux on a daily basis, or someone needs to migrate the one's config to the another.
+So the target user is who adopts both Mac and Linux on a daily basis, or someone needs to migrate one's config to the another.
 
 ## Supported Features
 
@@ -17,26 +17,33 @@ Supported configuration files are the ones relating to:
 
 ## Installation
 
-* The most primitive way is to download binary package
+* TBD: The most primitive way is to download binary package
 
 ## Usage
 
 #### Command Arguments
 
-1. Specify required parameters in environmental variables
-    * `AL2_ALFRED_PATH`: a path to Alfred's config directory
-    * `AL2_ALBERT_PATH`: a path to Albert's config directory
-1. Execute commands like as following:
+Specify required parameters in environmental variables:
+
+* `AL2_ALFRED_PATH`: a path to Alfred's config directory
+* `AL2_ALBERT_PATH`: a path to Albert's config directory
+* `AL2_DRY_RUN`: set `1` to dump merged configurations 
+* `AL2_VERBOSE`: set `1` to print out detailed logs
+
+You can execute commands like as following:
 
 ```bash
-export AL2_ALFRED_PATH="__ALFRED_CONFIG_DIR__" AL2_ALBERT_PATH="__ALBERT_CONFIG_DIR__"
-./altogether help
+export AL2_ALFRED_PATH="${HOME}/.config/Alfred.alfredpreferences"
+export AL2_ALBERT_PATH="${HOME}/.config/albert"
+export AL2_DRY_RUN=1
+export AL2_VERBOSE=1
+./altogether sync-web
 ```
 
 #### Systemd Configurations
 
-1. Refer to `./sample` directory and place unit files to `~/.config/systemd/user/`, etc
-1. Run the command like below:
+1. Place unit files to `~/.config/systemd/user/`. Sample systemd configuration files are available at `./sample`.
+1. Run commands like below to test:
 
 ```bash
 systemctl --user daemon-reload && systemctl --user restart altogether
@@ -62,5 +69,6 @@ Here's how to get started!
 1. Build container:
  
  ```bash
- ./script/ci.sh init
+./script/ci.sh init
+./script/ci.sh ci
 ```
