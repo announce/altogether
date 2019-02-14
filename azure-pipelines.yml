@@ -16,7 +16,7 @@ variables:
 steps:
     -
         script: bash script/ci.sh build-container
-        displayName: 'docker build'
+        displayName: 'Docker build'
     -
         script: bash script/ci.sh ci
         displayName: 'CI'
