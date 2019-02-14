@@ -23,6 +23,7 @@ _ci () {
     echo "ASSET_DIR:${ASSET_DIR}"
     docker run --rm --interactive \
       --env ASSET_DIR="${ASSET_DIR:=pkg}" \
+      --volume "${ASSET_DIR}:${ASSET_DIR}" \
       --volume "${PWD}:/go/src/${PKG_PATH}" \
       "${TAG_NAME}:${TAG_VERSION}" "$@"
   }
