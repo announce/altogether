@@ -15,4 +15,21 @@ gox \
     -arch="${XC_ARCH}" \
     -output "${ASSET_DIR}/{{.OS}}-{{.Arch}}/{{.Dir}}"
 
-find "${ASSET_DIR}" -mindepth 1 -type d -print0 | xargs -0 -I@ zip -r "@.zip" "@"
+type sha256sum awk
+compress () {
+  cat << EOS
+    {
+      TARGET_PATH="@"
+      DIRNAME="\$(basename "\${TARGET_PATH}")"
+      TARBALL="\${DIRNAME}.tar.gz"
+      cd "\${TARGET_PATH}/.."
+      tar cfvz "\${TARBALL}" "\${DIRNAME}"
+      FINGERPRINT="\$(sha256sum -b "\${TARBALL}" | awk '{print \$1}')"
+      echo "\${FINGERPRINT}" > "\${DIRNAME}-\${FINGERPRINT:0:7}.txt"
+    }
+EOS
+}
+
+find "${ASSET_DIR}" -mindepth 1 -type d -print0 | xargs -0 -I @ sh -c "$(compress)"
+
+ls -la "${ASSET_DIR}"

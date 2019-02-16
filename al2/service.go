@@ -16,7 +16,7 @@ type Handler struct {
 
 func (h *Handler) SyncWeb(c *cli.Context) error {
 	h.log = util.CreateLogger(c.App.ErrWriter, h)
-	h.log.Printf("Starting sync-web with option: %#v", c)
+	h.log.Printf("Starting sync-web %+v", c.App.Version)
 	if err := h.verifyRequiredParams(c); err != nil {
 		return err
 	}

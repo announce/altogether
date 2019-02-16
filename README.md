@@ -8,7 +8,7 @@ Altogether
 Altogether is a CLI tool to synchronize configuration files between 2 major keyboard launchers -- [Alfred](https://www.alfredapp.com/) and [Albert](https://albertlauncher.github.io/).
 So the target user is who adopts both Mac and Linux on a daily basis, or someone needs to migrate one's config to the another.
 
-## Supported Features
+## Available Features
 
 Supported configuration files are the ones relating to:
 
@@ -17,7 +17,9 @@ Supported configuration files are the ones relating to:
 
 ## Installation
 
-* TBD: The most primitive way is to download binary package
+* Download package from [![the latest release](https://img.shields.io/github/release/announce/altogether.svg?style=flat)](https://github.com/announce/altogether/releases/latest) accordingly
+  * macOS: `darwin-amd64.zip`
+  * Linux: `linux-amd64.zip`
 
 ## Usage
 
@@ -40,9 +42,17 @@ export AL2_VERBOSE=1
 ./altogether sync-web
 ```
 
-#### Systemd Configurations
+Or, you also can specify command options like below:
 
-1. Place unit files to `~/.config/systemd/user/`. Sample systemd configuration files are available at `./sample`.
+```bash
+altogether sync-web --dry-run --alfred-path ~/.config/Alfred.alfredpreferences --albert-path ~/.config/testdata/albert
+```
+
+#### TBD: Systemd Configurations
+
+Consider set up Systemd configuration if you want to automatically sync configurations.
+
+1. Place unit files to `~/.config/systemd/user/`. Sample systemd configuration files are available under `./sample`.
 1. Run commands like below to test:
 
 ```bash
