@@ -25,7 +25,7 @@ compress () {
       cd "\${TARGET_PATH}/.."
       tar cfvz "\${TARBALL}" "\${DIRNAME}"
       FINGERPRINT="\$(sha256sum -b "\${TARBALL}" | awk '{print \$1}')"
-      echo "\${FINGERPRINT}" > "\${DIRNAME}-\${FINGERPRINT:0:7}.txt"
+      echo "\${FINGERPRINT}" > "\${DIRNAME}-sha2-\${FINGERPRINT:0:7}.txt"
     }
 EOS
 }

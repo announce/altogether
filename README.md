@@ -17,9 +17,29 @@ Supported configuration files are the ones relating to:
 
 ## Installation
 
-* Download package from [![the latest release](https://img.shields.io/github/release/announce/altogether.svg?style=flat)](https://github.com/announce/altogether/releases/latest) accordingly
-  * macOS: `darwin-amd64.zip`
-  * Linux: `linux-amd64.zip`
+#### How to get `altogether` command
+
+One of the simplest way is:
+
+1. Download package from [![the latest release](https://img.shields.io/github/release/announce/altogether.svg?style=flat)](https://github.com/announce/altogether/releases/latest) according to platform:
+  * macOS: `darwin-amd64.tar.gz`
+  * Linux: `linux-amd64.tar.gz`
+1. Extract the compressed tarball and place `altogether` to somewhere under `PATH` directory:
+
+```bash
+tar -C ~/Downloads/ -zxvf DOWNLOADED_FILE.tar.gz
+mv ~/Downloads/DOWNLOADED_FILE/altogether /usr/local/bin
+altogether --help
+```
+
+#### For Arch Linux users
+
+If you are using Arch Linux, [AUR Package](https://aur.archlinux.org/packages/altogether/) is recommended.
+Install `altogether` with AUR helper such as `yay`:
+
+```bash
+yay -Syu altogether
+```
 
 ## Usage
 
