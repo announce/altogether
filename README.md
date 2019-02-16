@@ -22,13 +22,13 @@ Supported configuration files are the ones relating to:
 One of the simplest way is:
 
 1. Download package from [![the latest release](https://img.shields.io/github/release/announce/altogether.svg?style=flat)](https://github.com/announce/altogether/releases/latest) according to platform:
-  * macOS: `darwin-amd64.tar.gz`
-  * Linux: `linux-amd64.tar.gz`
+    * macOS: `darwin-amd64.tar.gz`
+    * Linux: `linux-amd64.tar.gz`
 1. Extract the compressed tarball and place `altogether` to somewhere under `PATH` directory:
 
 ```bash
-tar -C ~/Downloads/ -zxvf DOWNLOADED_FILE.tar.gz
-mv ~/Downloads/DOWNLOADED_FILE/altogether /usr/local/bin
+tar -C ~/Downloads/ -zxvf darwin-amd64.tar.gz
+mv ~/Downloads/darwin-amd64/altogether /usr/local/bin
 altogether --help
 ```
 
