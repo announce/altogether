@@ -14,6 +14,7 @@ init: install lint build test
 
 install:
 	go get -t -v
+	go get -v github.com/mitchellh/gox
 
 build:
 	go build -v $(BUILD_FLAGS)
@@ -25,7 +26,6 @@ lint:
 	go vet .
 
 release:
-	go get -v github.com/mitchellh/gox
 	VERSION="$(VERSION)" ASSET_DIR="$(ASSET_DIR)" ./script/release.sh
 	touch pkg/.gitkeep
 
@@ -34,3 +34,4 @@ $(GO_TESTED): $(GO_FILES)
 	touch $(GO_TESTED)
 
 include script/*.mk
+

@@ -30,6 +30,6 @@ compress () {
 EOS
 }
 
-find "${ASSET_DIR}" -mindepth 1 -type d -print0 | xargs -0 -I @ sh -c "$(compress)"
+find "${ASSET_DIR}" -mindepth 1 -type d -print0 | xargs -0 -I @ bash -c "$(compress)"
 
 ls -la "${ASSET_DIR}"
