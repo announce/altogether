@@ -27,9 +27,9 @@ One of the simplest way is:
 1. Extract the compressed tarball and place `altogether` to somewhere under `PATH` directory:
 
 ```bash
-tar -C ~/Downloads/ -zxvf darwin-amd64.tar.gz
-mv ~/Downloads/darwin-amd64/altogether /usr/local/bin
-altogether --help
+curl -L https://github.com/announce/altogether/releases/download/v0.1.2/darwin-amd64.tar.gz | tar -zxvf - \
+&& mv ./darwin-amd64/altogether /usr/local/bin \
+&& altogether --help
 ```
 
 #### For Arch Linux users
