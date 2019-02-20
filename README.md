@@ -44,8 +44,8 @@ Unless specified above, one of the simplest ways for your platform is:
 1. Extract the compressed tarball and place `altogether` to somewhere under `PATH` directory:
 
 ```bash
-curl -L https://github.com/announce/altogether/releases/download/v0.1.2/darwin-amd64.tar.gz | tar -zxvf - \
-&& mv ./darwin-amd64/altogether /usr/local/bin \
+curl -L https://github.com/announce/altogether/releases/download/v0.1.2/linux-amd64.tar.gz | tar -zxvf - \
+&& mv ./linux-amd64/altogether /usr/local/bin \
 && altogether --help
 ```
 
@@ -57,7 +57,7 @@ Specify required parameters in environmental variables:
 
 * `AL2_ALFRED_PATH`: a path to Alfred's config directory
 * `AL2_ALBERT_PATH`: a path to Albert's config directory
-* `AL2_DRY_RUN`: set `1` to dump merged configurations 
+* `AL2_DRY_RUN`: set `1` to dump merged configurations without actual file change
 * `AL2_VERBOSE`: set `1` to print out detailed logs
 
 You can execute commands like as following:
