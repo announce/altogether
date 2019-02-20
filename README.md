@@ -17,9 +17,26 @@ Supported configuration files are the ones relating to:
 
 ## Installation
 
+#### For Mac users
+
+Go ahead and grab Homebrewed `altogether`:
+
+```bash
+brew install announce/homebrew-altogether/altogether
+```
+
+#### For Arch Linux users
+
+If you are using Arch Linux, [AUR Package](https://aur.archlinux.org/packages/altogether/) is recommended.
+Install `altogether` with AUR helper such as `yay`:
+
+```bash
+yay -Syu altogether
+```
+
 #### How to get `altogether` command
 
-One of the simplest way is:
+Unless specified above, one of the simplest ways for your platform is:
 
 1. Download package from [![the latest release](https://img.shields.io/github/release/announce/altogether.svg?style=flat)](https://github.com/announce/altogether/releases/latest) according to platform:
     * macOS: `darwin-amd64.tar.gz`
@@ -30,15 +47,6 @@ One of the simplest way is:
 curl -L https://github.com/announce/altogether/releases/download/v0.1.2/darwin-amd64.tar.gz | tar -zxvf - \
 && mv ./darwin-amd64/altogether /usr/local/bin \
 && altogether --help
-```
-
-#### For Arch Linux users
-
-If you are using Arch Linux, [AUR Package](https://aur.archlinux.org/packages/altogether/) is recommended.
-Install `altogether` with AUR helper such as `yay`:
-
-```bash
-yay -Syu altogether
 ```
 
 ## Usage
@@ -96,9 +104,14 @@ journalctl --user -xe -u altogether
 Here's how to get started!
 
 1. Install [Docker](https://docs.docker.com/install/) (verified version: `18.09.1-ce`)
-1. Build container:
+1. Build a container and start debugging:
  
  ```bash
 ./script/ci.sh init
 ./script/ci.sh ci
 ```
+
+Related repositories:
+
+* [announce/homebrew-altogether](https://github.com/announce/homebrew-altogether)
+* [announce/altogether-aur](https://github.com/announce/altogether-aur)
