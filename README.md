@@ -114,4 +114,4 @@ Here's how to get started!
 Related repositories:
 
 * [announce/homebrew-altogether](https://github.com/announce/homebrew-altogether)
-* [announce/altogether-aur](https://github.com/announce/altogether-aur)
+* [announce/aur-altogether](https://github.com/announce/aur-altogether)
