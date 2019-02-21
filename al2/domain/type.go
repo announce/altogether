@@ -19,7 +19,3 @@ func (t Type) String() string {
 		"Albert",
 	}[t]
 }
-
-type TypedConfig interface {
-	Path(Type) string
-}

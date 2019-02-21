@@ -9,15 +9,9 @@ import (
 	"time"
 )
 
-type ConfigPath map[domain.Type]string
-
-var Config = ConfigPath{
+var Config = domain.ConfigPath{
 	domain.Alfred: "preferences/features/websearch/prefs.plist",
 	domain.Albert: "org.albert.extension.websearch/engines.json",
-}
-
-func (c ConfigPath) Path(p domain.Type) string {
-	return c[p]
 }
 
 type Launcher struct {
