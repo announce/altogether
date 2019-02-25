@@ -16,7 +16,8 @@ type SiteConfig struct {
 	IconPath string `plist:"-" json:"iconPath"`
 }
 
-func (a *SiteConfig) Id() Id {
+func (s *SiteConfig) Id() Id {
+	a := s
 	a.Normalize()
 	b := bytes.Buffer{}
 	b.WriteString(a.Trigger)
@@ -24,24 +25,24 @@ func (a *SiteConfig) Id() Id {
 	return sha1.Sum(b.Bytes())
 }
 
-func (a *SiteConfig) PreserveUuid(key string) {
-	a.Uuid = key
+func (s *SiteConfig) PreserveUuid(key string) {
+	s.Uuid = key
 }
 
-func (a *SiteConfig) Normalize() {
-	a.Albert()
+func (s *SiteConfig) Normalize() {
+	s.Albert()
 }
 
 const Spacer = " "
 
-func (a *SiteConfig) Albert() {
-	a.Url = strings.Replace(a.Url, "{query}", "%s", -1)
-	a.Name = strings.Replace(a.Name, "{query}", "%s", -1)
-	a.Trigger = strings.Trim(a.Trigger, Spacer) + Spacer
+func (s *SiteConfig) Albert() {
+	s.Url = strings.Replace(s.Url, "{query}", "%s", -1)
+	s.Name = strings.Replace(s.Name, "{query}", "%s", -1)
+	s.Trigger = strings.Trim(s.Trigger, Spacer) + Spacer
 }
 
-func (a *SiteConfig) Alfred() {
-	a.Url = strings.Replace(a.Url, "%s", "{query}", -1)
-	a.Name = strings.Replace(a.Name, "%s", "{query}", -1)
-	a.Trigger = strings.Trim(a.Trigger, Spacer)
+func (s *SiteConfig) Alfred() {
+	s.Url = strings.Replace(s.Url, "%s", "{query}", -1)
+	s.Name = strings.Replace(s.Name, "%s", "{query}", -1)
+	s.Trigger = strings.Trim(s.Trigger, Spacer)
 }

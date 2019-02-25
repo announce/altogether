@@ -23,7 +23,10 @@ func TestWeb_Sync(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	out := bytes.Buffer{}
 	errOut := out
-	pair, _ := newPair()
+	pair, err := newPair()
+	if err != nil {
+		panic(err)
+	}
 	w := web.Web{
 		Launchers: pair,
 		Out:       &out,

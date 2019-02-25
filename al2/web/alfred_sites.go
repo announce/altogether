@@ -10,14 +10,26 @@ import (
 type CustomSites map[string]*SiteConfig
 type AlfredSites struct {
 	CustomSites `plist:"customSites"`
+	list        []*SiteConfig
+}
+
+func (a *AlfredSites) List() []*SiteConfig {
+	for _, v := range a.CustomSites {
+		a.list = append(a.list, v)
+	}
+	return a.list
+}
+
+func (a *AlfredSites) Populate(dict ConfigDict) {
+	for k, v := range a.CustomSites {
+		v.PreserveUuid(k)
+		dict[v.Id()] = v
+	}
 }
 
 func (a *AlfredSites) Decode(r io.ReadSeeker) error {
 	decoder := plist.NewDecoder(r)
-	if err := decoder.Decode(a); err != nil {
-		return err
-	}
-	return nil
+	return decoder.Decode(a)
 }
 
 func (a *AlfredSites) Encode(dict ConfigDict) ([]byte, error) {
@@ -30,7 +42,7 @@ func (a *AlfredSites) Encode(dict ConfigDict) ([]byte, error) {
 	return data.Bytes(), nil
 }
 
-func (a *AlfredSites) Convert(dict ConfigDict) AlfredSites {
+func (a *AlfredSites) Convert(dict ConfigDict) Sites {
 	sites := make(CustomSites)
 	for _, site := range dict {
 		config := site
@@ -40,5 +52,5 @@ func (a *AlfredSites) Convert(dict ConfigDict) AlfredSites {
 		config.Alfred()
 		sites[config.Uuid] = config
 	}
-	return AlfredSites{sites}
+	return &AlfredSites{CustomSites: sites}
 }

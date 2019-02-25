@@ -9,6 +9,16 @@ import (
 
 type AlbertSites []*SiteConfig
 
+func (a *AlbertSites) List() []*SiteConfig {
+	return *a
+}
+
+func (a *AlbertSites) Populate(dict ConfigDict) {
+	for _, v := range *a {
+		dict[v.Id()] = v
+	}
+}
+
 func (a *AlbertSites) Decode(r io.ReadSeeker) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -26,12 +36,12 @@ func (a *AlbertSites) Encode(dict ConfigDict) ([]byte, error) {
 	return j, err
 }
 
-func (a *AlbertSites) Convert(dict ConfigDict) AlbertSites {
+func (a *AlbertSites) Convert(dict ConfigDict) Sites {
 	var sites AlbertSites
 	for _, site := range dict {
 		config := site
 		config.Albert()
 		sites = append(sites, config)
 	}
-	return sites
+	return &sites
 }

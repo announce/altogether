@@ -39,15 +39,21 @@ func TestLauncher_Parse(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	t.Run("it works with Alfred", func(t *testing.T) {
 		launcher := newLauncher(domain.Alfred)
+		if err := launcher.Load(); err != nil {
+			panic(err)
+		}
 		err := launcher.Parse()
 		assert.OK(t, err == nil)
-		assert.OK(t, launcher.AlfredSites != nil)
+		assert.OK(t, launcher.Sites != nil)
 	})
 	t.Run("it works with Albert", func(t *testing.T) {
 		launcher := newLauncher(domain.Albert)
+		if err := launcher.Load(); err != nil {
+			panic(err)
+		}
 		err := launcher.Parse()
 		assert.OK(t, err == nil)
-		assert.OK(t, launcher.AlbertSites != nil)
+		assert.OK(t, launcher.Sites != nil)
 	})
 }
 

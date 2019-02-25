@@ -33,7 +33,8 @@ func (w *Web) Sync(option Option) error {
 		w.log.Printf("DtyRun: %v", option.DryRun)
 	}
 	if option.DryRun {
-		if _, err := fmt.Fprintln(w.Out, w.ConfigDict); err != nil {
+		diff := w.Launchers.Diff(w.ConfigDict)
+		if _, err := fmt.Fprintln(w.Out, diff); err != nil {
 			return err
 		}
 	} else {
