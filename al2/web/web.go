@@ -16,7 +16,7 @@ type Web struct {
 }
 
 type Option struct {
-	DtyRun  bool
+	DryRun  bool
 	Verbose bool
 }
 
@@ -30,10 +30,11 @@ func (w *Web) Sync(option Option) error {
 	if option.Verbose {
 		w.log.Printf("Launchers: (0,1)=(%v,%v)", w.Launchers[0].Type, w.Launchers[1].Type)
 		w.log.Printf("ConfigDict count: %v", len(w.ConfigDict))
-		w.log.Printf("DtyRun: %v", option.DtyRun)
+		w.log.Printf("DtyRun: %v", option.DryRun)
 	}
-	if option.DtyRun {
-		if _, err := fmt.Fprintln(w.Out, w.ConfigDict); err != nil {
+	if option.DryRun {
+		diff := w.Launchers.Diff(w.ConfigDict)
+		if _, err := fmt.Fprintln(w.Out, diff); err != nil {
 			return err
 		}
 	} else {

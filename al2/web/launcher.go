@@ -9,15 +9,9 @@ import (
 	"time"
 )
 
-type ConfigPath map[domain.Type]string
-
-var Config = ConfigPath{
+var Config = domain.ConfigPath{
 	domain.Alfred: "preferences/features/websearch/prefs.plist",
 	domain.Albert: "org.albert.extension.websearch/engines.json",
-}
-
-func (c ConfigPath) Path(p domain.Type) string {
-	return c[p]
 }
 
 type Launcher struct {
@@ -25,12 +19,22 @@ type Launcher struct {
 	BasePath   string
 	ConfigPath string
 	FileInfo   os.FileInfo
-	*AlfredSites
-	AlbertSites
+	Sites      Sites
 }
 
 func (l *Launcher) Init() {
-	l.AlfredSites = &AlfredSites{}
+	switch l.Type {
+	case domain.Alfred:
+		{
+			l.Sites = &AlfredSites{}
+		}
+	case domain.Albert:
+		{
+			l.Sites = &AlbertSites{}
+		}
+	default:
+		panic(domain.UnexpectedType)
+	}
 	l.ConfigPath = filepath.Join(l.BasePath, Config[l.Type])
 }
 
@@ -59,51 +63,25 @@ func (l *Launcher) Parse() error {
 		}
 		err = fmt.Errorf("failed to close: %v, the original error: %v", c, err)
 	}()
-	switch l.Type {
-	case domain.Alfred:
-		{
-			return l.AlfredSites.Decode(file)
-		}
-	case domain.Albert:
-		{
-			return l.AlbertSites.Decode(file)
-		}
-	default:
-		panic(domain.UnexpectedType)
-	}
-	return nil
+	return l.Sites.Decode(file)
 }
 
 func (l *Launcher) Populate(dict ConfigDict) {
-	// @TODO interception mode to sync deleted config
-	switch l.Type {
-	case domain.Alfred:
-		{
-			for k, v := range l.AlfredSites.CustomSites {
-				v.PreserveUuid(k)
-				dict[v.Id()] = v
-			}
-		}
-	case domain.Albert:
-		{
-			for _, v := range l.AlbertSites {
-				dict[v.Id()] = v
-			}
-		}
-	default:
-		panic(domain.UnexpectedType)
-	}
+	l.Sites.Populate(dict)
+}
 
+func (l *Launcher) Diff(diff Diff) {
+	for _, v := range l.Sites.List() {
+		if order, ok := diff[v.Id()]; ok {
+			diff[v.Id()] = append(order, l.Type)
+		} else {
+			diff[v.Id()] = []domain.Type{l.Type}
+		}
+	}
 }
 
 func (l *Launcher) Save(dict ConfigDict) error {
-	var output []byte
-	var err error
-	if l.Type == domain.Alfred {
-		output, err = l.AlfredSites.Encode(dict)
-	} else if l.Type == domain.Albert {
-		output, err = l.AlbertSites.Encode(dict)
-	}
+	output, err := l.Sites.Encode(dict)
 	if err != nil {
 		return err
 	}

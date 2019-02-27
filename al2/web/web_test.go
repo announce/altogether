@@ -23,19 +23,22 @@ func TestWeb_Sync(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	out := bytes.Buffer{}
 	errOut := out
-	pair, _ := newPair()
+	pair, err := newPair()
+	if err != nil {
+		panic(err)
+	}
 	w := web.Web{
 		Launchers: pair,
 		Out:       &out,
 		ErrOut:    &errOut,
 	}
 	t.Run("it works with no dry-run option", func(t *testing.T) {
-		err := w.Sync(web.Option{DtyRun: false, Verbose: false})
+		err := w.Sync(web.Option{DryRun: false, Verbose: false})
 		assert.OK(t, err == nil)
 		assert.OK(t, w.ConfigDict != nil)
 	})
 	t.Run("it works with dry-run option", func(t *testing.T) {
-		err := w.Sync(web.Option{DtyRun: true, Verbose: true})
+		err := w.Sync(web.Option{DryRun: true, Verbose: true})
 		assert.OK(t, err == nil)
 		assert.OK(t, strings.Count(out.String(), "\n") == len(w.ConfigDict))
 	})

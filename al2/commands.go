@@ -29,7 +29,7 @@ var optionFlags = []cli.Flag{
 	},
 	cli.BoolFlag{
 		Name:   "dry-run",
-		Usage:  "Print merged configurations without actual file change",
+		Usage:  "Print merged configurations in TSV style without actual file change",
 		EnvVar: "AL2_DRY_RUN",
 	},
 	cli.BoolFlag{

@@ -34,7 +34,7 @@ func (h *Handler) SyncWeb(c *cli.Context) error {
 		ErrOut:    c.App.ErrWriter,
 	}
 	return w.Sync(web.Option{
-		DtyRun:  c.Bool("dry-run"),
+		DryRun:  c.Bool("dry-run"),
 		Verbose: c.Bool("verbose"),
 	})
 }
