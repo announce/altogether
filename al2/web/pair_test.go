@@ -54,9 +54,23 @@ func TestPair_Merge(t *testing.T) {
 	})
 }
 
+func TestPair_Diff(t *testing.T) {
+	defer helper.MustRemoveTmpDir()
+	pair, err := newPair()
+	if err != nil {
+		panic(err)
+	}
+	dict := make(web.ConfigDict)
+	assert.OK(t, pair.Save(dict) == nil)
+}
+
 func TestPair_Save(t *testing.T) {
 	defer helper.MustRemoveTmpDir()
 	pair, err := newPair()
-	assert.OK(t, pair != nil)
-	assert.OK(t, err == nil)
+	if err != nil {
+		panic(err)
+	}
+	dict := web.ConfigDict{}
+	pair.Merge(dict)
+	assert.OK(t, pair.Diff(dict) != "")
 }
