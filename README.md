@@ -13,7 +13,7 @@ So the target user is who adopts both Mac and Linux on a daily basis, or someone
 Supported configuration files are the ones relating to:
 
 * [x] Web search
-* [ ] Snippets
+* [ ] Snippets (refer to [#13](https://github.com/announce/altogether/issues/13))
 
 ## Installation
 
@@ -83,7 +83,7 @@ Consider setting a Systemd configuration to run `altogether` automatically.
 
 1. Place unit files to `~/.config/systemd/user/`
     * You can find sample files under `sample/systemd/` in this repository
-1. Run commands like below to test:
+1. Register `altogether` and browse the logs like below:
 
 ```bash
 systemctl --user daemon-reload && systemctl --user restart altogether
