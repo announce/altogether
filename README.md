@@ -76,9 +76,9 @@ Or, you also can specify command options like below:
 altogether sync-web --dry-run --alfred-path ~/.config/Alfred.alfredpreferences --albert-path ~/.config/testdata/albert
 ```
 
-#### TBD: Systemd Configurations
+#### Experimental: Systemd Configurations
 
-Consider set up Systemd configuration if you want to automatically sync configurations.
+Consider setting up Systemd configuration to sync configurations automatically.
 
 1. Place unit files to `~/.config/systemd/user/`. Sample systemd configuration files are available under `./sample`.
 1. Run commands like below to test:
