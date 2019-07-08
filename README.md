@@ -53,14 +53,21 @@ curl -L https://github.com/announce/altogether/releases/download/v0.1.2/linux-am
 
 #### Command Arguments
 
-Specify required parameters in environmental variables:
+There are 2 ways to specify arguments.
+One is to use command options like below:
+
+```bash
+altogether sync-web --dry-run --alfred-path ~/.config/Alfred.alfredpreferences --albert-path ~/.config/testdata/albert
+```
+
+In the other way, you can specify parameters in environmental variables:
 
 * `AL2_ALFRED_PATH`: a path to Alfred's config directory
 * `AL2_ALBERT_PATH`: a path to Albert's config directory
 * `AL2_DRY_RUN`: set `1` to dump merged configurations in TSV style without actual file change
 * `AL2_VERBOSE`: set `1` to print out detailed logs
 
-You can execute commands like as following:
+For instance, you can execute commands like as following:
 
 ```bash
 export AL2_ALFRED_PATH="${HOME}/.config/Alfred.alfredpreferences"
@@ -70,17 +77,12 @@ export AL2_VERBOSE=1
 ./altogether sync-web
 ```
 
-Or, you also can specify command options like below:
-
-```bash
-altogether sync-web --dry-run --alfred-path ~/.config/Alfred.alfredpreferences --albert-path ~/.config/testdata/albert
-```
-
 #### Experimental: Systemd Configurations
 
-Consider setting up Systemd configuration to sync configurations automatically.
+Consider setting a Systemd configuration to run `altogether` automatically.
 
-1. Place unit files to `~/.config/systemd/user/`. Sample systemd configuration files are available under `./sample`.
+1. Place unit files to `~/.config/systemd/user/`
+    * You can find sample files under `sample/systemd/` in this repository
 1. Run commands like below to test:
 
 ```bash
@@ -99,7 +101,7 @@ journalctl --user -xe -u altogether
 * 0.16.x
 
 
-## Contribution
+## Development Contribution
 
 Here's how to get started!
 
